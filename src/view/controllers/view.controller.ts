@@ -2,13 +2,13 @@ import { Controller, Get, Render } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { RelatorioFiesService } from 'src/relatorio-fies/services/relatorio-fies.services';
 
-@Controller('poker')
-@ApiTags('poker')
+@Controller('relatorio-fies/view')
+@ApiTags('relatorio-fies/view')
 export class ViewController {
     constructor(
         private readonly relatorioFies: RelatorioFiesService
     ){}
-    @Get('/')
+    @Get('/home')
     @Render('relatorio-fies/home')
     public async home () {          
         return {  layout: "template" };

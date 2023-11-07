@@ -18,4 +18,14 @@ export class RelatorioFiesController {
     public async findAll () {
         return this.relatorioFiesService.findAll();
     }
+
+    @Get('/import-csv')
+    @ApiOperation({
+        summary: "Importa o csv e popula a tabela com os dados do csv",
+        description: "Importa o csv e popula a tabela com os dados do csv"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async importCsvAndPopulateTable () {
+        return this.relatorioFiesService.importCsvAndPopulateTable();
+    }
 }

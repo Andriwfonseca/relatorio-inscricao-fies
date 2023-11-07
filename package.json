@@ -46,6 +46,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "config": "3.3.8",
+    "convert-csv-to-json": "^2.0.0",
     "cookie-parser": "1.4.6",
     "eslint": "8.31.0",
     "eslint-config-prettier": "8.6.0",
