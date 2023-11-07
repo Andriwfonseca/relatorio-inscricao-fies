@@ -1,0 +1,5 @@
+{
+    "name": "production",
+    "port": 3004,
+    "prefix": ""
+}

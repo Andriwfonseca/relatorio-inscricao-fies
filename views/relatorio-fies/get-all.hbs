@@ -1,0 +1,30 @@
+<h1 style="margin-left: 120px">Jogadores</h1>
+<table>
+  <thead>
+    <tr>
+      <th scope="col">Nome</th>
+      <th scope="col">Vitórias</th>
+      <th scope="col">Derrotas</th>
+      <th scope="col">Partidas</th>
+      <th scope="col">Saldo</th>
+      <th scope="col">A receber</th>
+      <th scope="col">Devendo</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each viewModel}}
+    <tr data-id="{{id}}">
+      <td data-label="Nome" data-id="{{id}}">{{nome}}</td>
+      <td data-label="Vitórias" data-id="{{id}}">{{qtd_vitorias}}</td>
+      <td data-label="Derrotas" data-id="{{id}}">{{qtd_derrotas}}</td>
+      <td data-label="Partidas" data-id="{{id}}">{{qtd_partidas}}</td>
+      <td data-label="Saldo" data-id="{{id}}">R$ {{saldo}}</td>
+      <td data-label="Receber" data-id="{{id}}">R$ {{receber}}</td>
+      <td data-label="Devendo" data-id="{{id}}">R$ {{devendo}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+<script>
+
+</script>

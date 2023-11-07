@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model inscricao_fies {
+  id                            Int       @id @default(autoincrement())
+  ano_processo_seletivo         String    @db.Char(255)
+  semestre_processo_seletivo    String?   @db.VarChar(255)
+  sexo                          String?   @db.VarChar(1)
+  data_nascimento               DateTime? @db.Date
+  uf_residencia                 String?   @db.VarChar(2)
+  municipio_residencia          String?   @db.VarChar(255)
+  etnia_cor                     String?   @db.VarChar(255)
+  pessoa_deficiente             String?   @db.VarChar(3)
+  ano_conclusao_ensino_medio    String?   @db.VarChar(4)
+  concluiu_curso_superior       String?   @db.VarChar(3)
+  numero_membros_grupo_familiar Int?
+  inscricao_fiescol             String?   @db.VarChar(45)
+  renda_familiar_mensal_bruta   Decimal?  @db.Decimal(5, 2)
+  regiao_grupo_preferencia      String?   @db.VarChar(45)
+  uf                            String?   @db.VarChar(45)
+  conceito_curso_gp             Int?
+  area_conhecimento             String?   @db.VarChar(255)
+  sub_area_conhecimento         String?   @db.VarChar(255)
+  nota_corte_grupo_preferencia  Decimal?  @db.Decimal(10, 0)
+  media_nota_enem               Decimal?  @db.Decimal(10, 0)
+  ano_enem                      Int?
+  redacao                       Int?
+  situacao_inscricao_fies       String?   @db.VarChar(255)
+  percentual_financiamento      Decimal?  @db.Decimal(10, 0)
+  semestre_financiamento        Int?
+  qtde_semestre_financiado      Int?
+}
