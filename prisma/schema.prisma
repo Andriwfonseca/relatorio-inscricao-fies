@@ -22,18 +22,18 @@ model inscricao_fies {
   concluiu_curso_superior       String?   @db.VarChar(3)
   numero_membros_grupo_familiar Int?
   inscricao_fiescol             String?   @db.VarChar(45)
-  renda_familiar_mensal_bruta   Decimal?  @db.Decimal(5, 2)
+  renda_familiar_mensal_bruta   Float?    @db.Float
   regiao_grupo_preferencia      String?   @db.VarChar(45)
   uf                            String?   @db.VarChar(45)
   conceito_curso_gp             Int?
   area_conhecimento             String?   @db.VarChar(255)
   sub_area_conhecimento         String?   @db.VarChar(255)
-  nota_corte_grupo_preferencia  Decimal?  @db.Decimal(10, 0)
-  media_nota_enem               Decimal?  @db.Decimal(10, 0)
+  nota_corte_grupo_preferencia  Float?    @db.Float
+  media_nota_enem               Float?    @db.Float
   ano_enem                      Int?
   redacao                       Int?
   situacao_inscricao_fies       String?   @db.VarChar(255)
-  percentual_financiamento      Decimal?  @db.Decimal(10, 0)
+  percentual_financiamento      Float?    @db.Float
   semestre_financiamento        Int?
   qtde_semestre_financiado      Int?
 }
