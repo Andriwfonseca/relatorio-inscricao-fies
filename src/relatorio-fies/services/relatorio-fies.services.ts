@@ -7,21 +7,25 @@ import { RelatorioFiesDto } from "../dtos/relatorio-fies.dto";
 export class RelatorioFiesService {
     constructor(private readonly prisma: prismaService) { }
 
-    public async findAll () {
-        return this.prisma.inscricao_fies.findMany();
-    }
-
     public async findAllPaginated(dto: RelatorioFiesDto) {
         const skip = (dto.page - 1) * dto.perPage;
         const totalCount = await this.prisma.inscricao_fies.count();
         const data = await this.prisma.inscricao_fies.findMany({
-          skip,
-          take: dto.perPage,
+            skip,
+            take: dto.perPage,
         });
     
+        const hasNextPage = skip + dto.perPage < totalCount;
+        const hasPreviousPage = skip > 0;
+        const totalPages = Math.ceil(totalCount / dto.perPage);
+    
         return {
-          data,
-          totalCount,
+            data,
+            page: dto.page,
+            hasNextPage,
+            hasPreviousPage,
+            totalPages,
+            totalCount,
         };
     }
     

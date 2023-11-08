@@ -1,5 +1,6 @@
 import { Controller, Get, Render } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { RelatorioFiesDto } from 'src/relatorio-fies/dtos/relatorio-fies.dto';
 import { RelatorioFiesService } from 'src/relatorio-fies/services/relatorio-fies.services';
 
 @Controller('relatorio-fies/view')
@@ -14,10 +15,10 @@ export class ViewController {
         return {  layout: "template" };
     }
 
-    @Get('/get-all')
+    @Get('/get-all-paginated')
     @Render('relatorio-fies/get-all')
-    public async createUser () {   
-        const viewModel = await this.relatorioFies.findAll(); 
+    public async findAllPaginated (dto: RelatorioFiesDto) {   
+        const viewModel = await this.relatorioFies.findAllPaginated(dto); 
         console.log(viewModel, 'viewModel')   
         return {  viewModel, layout: "template" };
     }
