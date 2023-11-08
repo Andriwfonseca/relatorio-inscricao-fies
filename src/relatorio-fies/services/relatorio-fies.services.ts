@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { prismaService } from "src/prisma/prisma.service";
 import { dataCsv } from '../../utils/csv-data';
+import { RelatorioFiesDto } from "../dtos/relatorio-fies.dto";
 
 @Injectable()
 export class RelatorioFiesService {
@@ -10,19 +11,32 @@ export class RelatorioFiesService {
         return this.prisma.inscricao_fies.findMany();
     }
 
+    public async findAllPaginated(dto: RelatorioFiesDto) {
+        const skip = (dto.page - 1) * dto.perPage;
+        const totalCount = await this.prisma.inscricao_fies.count();
+        const data = await this.prisma.inscricao_fies.findMany({
+          skip,
+          take: dto.perPage,
+        });
+    
+        return {
+          data,
+          totalCount,
+        };
+    }
+    
     public async importCsvAndPopulateTable () {   
         console.log('Iniciando carregamento do csv');
         try {
             let count = 0;
             for (const item of dataCsv) { 
-                if(count > 0) return;
                 const dataNascimentoParts = item.DatadeNascimento.split('/');
                 const dataNascimento = new Date(
                     parseInt(dataNascimentoParts[2]),
                     parseInt(dataNascimentoParts[1]) - 1,
                     parseInt(dataNascimentoParts[0])
                 );
-            
+                
                 await this.prisma.inscricao_fies.create({
                     data: {
                         ano_processo_seletivo: item.Anodoprocessoseletivo,
