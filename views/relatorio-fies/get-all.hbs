@@ -1,29 +1,67 @@
-<h1 style="margin-left: 120px">Jogadores</h1>
-<table>
+<h1 style="margin-left: 120px">Relatório Fies</h1>
+<table class="table table-bordered">
   <thead>
     <tr>
-      <th scope="col">Nome</th>
-      <th scope="col">Vitórias</th>
-      <th scope="col">Derrotas</th>
-      <th scope="col">Partidas</th>
-      <th scope="col">Saldo</th>
-      <th scope="col">A receber</th>
-      <th scope="col">Devendo</th>
+      <th scope="col" class="text-nowrap">Ano Processo Seletivo</th>
+      <th scope="col" class="text-nowrap">Semestre Processo Seletivo</th>
+      <th scope="col" class="text-nowrap">Sexo</th>
+      <th scope="col" class="text-nowrap">Data de Nascimento</th>
+      <th scope="col" class="text-nowrap">UF de Residência</th>
+      <th scope="col" class="text-nowrap">Município de Residência</th>
+      <th scope="col" class="text-nowrap">Etnia/Cor</th>
+      <th scope="col" class="text-nowrap">Pessoa com Deficiência</th>
+      <th scope="col" class="text-nowrap">Ano de Conclusão do Ensino Médio</th>
+      <th scope="col" class="text-nowrap">Concluiu Curso Superior</th>
+      <th scope="col" class="text-nowrap">Número de Membros do Grupo Familiar</th>
+      <th scope="col" class="text-nowrap">Renda Familiar Mensal Bruta</th>
+      <th scope="col" class="text-nowrap">Região do Grupo de Preferência</th>
+      <th scope="col" class="text-nowrap">UF</th>
+      <th scope="col" class="text-nowrap">Conceito do Curso GP</th>
+      <th scope="col" class="text-nowrap">Área do Conhecimento</th>
+      <th scope="col" class="text-nowrap">Subárea do Conhecimento</th>
+      <th scope="col" class="text-nowrap">Nota de Corte do Grupo de Preferência</th>
+      <th scope="col" class="text-nowrap">Média da Nota do ENEM</th>
+      <th scope="col" class="text-nowrap">Ano do ENEM</th>
+      <th scope="col" class="text-nowrap">Redação</th>
+      <th scope="col" class="text-nowrap">Situação da Inscrição no FIES</th>
+      <th scope="col" class="text-nowrap">Percentual de Financiamento</th>
+      <th scope="col" class="text-nowrap">Semestre de Financiamento</th>
+      <th scope="col" class="text-nowrap">Quantidade de Semestres Financiados</th>
     </tr>
   </thead>
   <tbody>
-    {{#each viewModel}}
-    <tr data-id="{{id}}">
-      <td data-label="Nome" data-id="{{id}}">{{nome}}</td>
-      <td data-label="Vitórias" data-id="{{id}}">{{qtd_vitorias}}</td>
-      <td data-label="Derrotas" data-id="{{id}}">{{qtd_derrotas}}</td>
-      <td data-label="Partidas" data-id="{{id}}">{{qtd_partidas}}</td>
-      <td data-label="Saldo" data-id="{{id}}">R$ {{saldo}}</td>
-      <td data-label="Receber" data-id="{{id}}">R$ {{receber}}</td>
-      <td data-label="Devendo" data-id="{{id}}">R$ {{devendo}}</td>
+    {{#each viewModel.data}}
+    <tr>
+      <td data-label="Ano Processo Seletivo" class="text-center">{{ano_processo_seletivo}}</td>
+      <td data-label="Semestre Processo Seletivo" class="text-center">{{semestre_processo_seletivo}}</td>
+      <td data-label="Sexo" class="text-center">{{sexo}}</td>
+      <td data-label="Data de Nascimento" class="text-center">{{data_nascimento}}</td>
+      <td data-label="UF de Residência" class="text-center">{{uf_residencia}}</td>
+      <td data-label="Município de Residência" class="text-center">{{municipio_residencia}}</td>
+      <td data-label="Etnia/Cor" class="text-center">{{etnia_cor}}</td>
+      <td data-label="Pessoa com Deficiência" class="text-center">{{pessoa_deficiente}}</td>
+      <td data-label="Ano de Conclusão do Ensino Médio" class="text-center">{{ano_conclusao_ensino_medio}}</td>
+      <td data-label="Concluiu Curso Superior" class="text-center">{{concluiu_curso_superior}}</td>
+      <td data-label="Número de Membros do Grupo Familiar" class="text-center">{{numero_membros_grupo_familiar}}</td>
+      <td data-label="Renda Familiar Mensal Bruta" class="text-center">{{renda_familiar_mensal_bruta}}</td>
+      <td data-label="Região do Grupo de Preferência" class="text-center">{{regiao_grupo_preferencia}}</td>
+      <td data-label="UF" class="text-center">{{uf}}</td>
+      <td data-label="Conceito do Curso GP" class="text-center">{{conceito_curso_gp}}</td>
+      <td data-label="Área do Conhecimento" class="text-center">{{area_conhecimento}}</td>
+      <td data-label="Subárea do Conhecimento" class="text-center">{{sub_area_conhecimento}}</td>
+      <td data-label="Nota de Corte do Grupo de Preferência" class="text-center">{{nota_corte_grupo_preferencia}}</td>
+      <td data-label="Média da Nota do ENEM" class="text-center">{{media_nota_enem}}</td>
+      <td data-label="Ano do ENEM" class="text-center">{{ano_enem}}</td>
+      <td data-label="Redação" class="text-center">{{redacao}}</td>
+      <td data-label="Situação da Inscrição no FIES" class="text-center">{{situacao_inscricao_fies}}</td>
+      <td data-label="Percentual de Financiamento" class="text-center">{{percentual_financiamento}}</td>
+      <td data-label="Semestre de Financiamento" class="text-center">{{semestre_financiamento}}</td>
+      <td data-label="Quantidade de Semestres Financiados" class="text-center">{{qtde_semestre_financiado}}</td>
     </tr>
     {{/each}}
   </tbody>
+</table>
+
 </table>
 <script>
 

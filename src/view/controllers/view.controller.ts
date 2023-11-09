@@ -17,7 +17,11 @@ export class ViewController {
 
     @Get('/get-all-paginated')
     @Render('relatorio-fies/get-all')
-    public async findAllPaginated (dto: RelatorioFiesDto) {   
+    public async findAllPaginated () {   
+        const dto: RelatorioFiesDto = {
+            page: 1,
+            perPage: 100
+        }
         const viewModel = await this.relatorioFies.findAllPaginated(dto); 
         console.log(viewModel, 'viewModel')   
         return {  viewModel, layout: "template" };
