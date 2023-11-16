@@ -87,48 +87,69 @@
             url: 'http://localhost:3004/relatorio-fies/get-age',
             type: 'get',
             dataType: 'json',
-            }).done(function (data) {
-            // Objeto para armazenar a contagem de cada idade
-            const contagemPorIdade = {};
+        }).done(function (data) {
+            // Objeto para armazenar a contagem de cada faixa etária
+            const contagemPorFaixaEtaria = {};
 
-            // Loop através do conjunto de dados para contar cada idade
+            // Definir as faixas etárias desejadas
+            const faixasEtarias = [
+                { min: 19, max: 24, label: '19-24' },
+                { min: 25, max: 29, label: '25-29' },
+                { min: 30, max: 34, label: '30-34' },
+                { min: 35, max: 39, label: '35-39' },
+                { min: 40, max: 44, label: '40-44' },
+                { min: 45, max: 49, label: '45-49' },
+                { min: 50, max: 54, label: '50-54' },
+                { min: 55, max: 59, label: '55-59' },
+                { min: 60, max: 64, label: '60-64' },
+                { min: 65, max: 69, label: '65-69' },
+                // Adicione mais faixas etárias conforme necessário
+            ];
+
+            // Inicializar contagem para cada faixa etária
+            faixasEtarias.forEach(faixa => {
+                contagemPorFaixaEtaria[faixa.label] = 0;
+            });
+
+            // Loop através do conjunto de dados para contar cada faixa etária
             data.forEach(item => {
                 const idade = item.idade;
-                contagemPorIdade[idade] = (contagemPorIdade[idade] || 0) + 1;
+
+                // Encontrar a faixa etária correspondente
+                const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
+
+                // Incrementar a contagem para a faixa etária encontrada
+                if (faixa) {
+                    contagemPorFaixaEtaria[faixa.label]++;
+                }
             });
 
             // Converter o objeto em um array para usar no gráfico de linhas
-            const dadosFormatados = Object.keys(contagemPorIdade).map(idade => ({
-                idade: parseInt(idade),
-                quantidade: contagemPorIdade[idade]
+            const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => ({
+                faixa: faixa,
+                quantidade: contagemPorFaixaEtaria[faixa]
             }));
 
-            // Organizar os dados por idade
-            dadosFormatados.sort((a, b) => a.idade - b.idade);
-
-            // Criar o gráfico de linhas com base nas idades
+            // Criar o gráfico de linhas com base nas faixas etárias
             google.charts.load('current', { 'packages': ['corechart'] });
             google.charts.setOnLoadCallback(function () {
                 const chartData = new google.visualization.DataTable();
-                chartData.addColumn('string', 'Idade');
+                chartData.addColumn('string', 'Faixa Etária');
                 chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.idade.toString(), item.quantidade]));
+                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
 
                 const options = {
-                title: 'Número de Registros por Idade',
-                curveType: 'function',
-                legend: { position: 'none' },
+                    title: 'Número de Registros por Faixa Etária',
+                    curveType: 'function',
+                    legend: { position: 'none' },
                 };
 
                 const chart = new google.visualization.LineChart(document.getElementById('chart'));
                 chart.draw(chartData, options);
             });
-            }).fail(function (jqXHR, textStatus, msg) {
+        }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
-            });
-
-
-
+        });
 
     } 
 
@@ -137,112 +158,137 @@
             url: 'http://localhost:3004/relatorio-fies/get-age',
             type: 'get',
             dataType: 'json',
-            }).done(function (data) {
-            // Objeto para armazenar a contagem de cada idade
-            const contagemPorIdade = {};
+        }).done(function (data) {
+            // Objeto para armazenar a contagem de cada faixa etária
+            const contagemPorFaixaEtaria = {};
 
-            // Loop através do conjunto de dados para contar cada idade
+            // Definir as faixas etárias desejadas
+            const faixasEtarias = [
+                { min: 19, max: 24, label: '19-24' },
+                { min: 25, max: 29, label: '25-29' },
+                { min: 30, max: 34, label: '30-34' },
+                { min: 35, max: 39, label: '35-39' },
+                { min: 40, max: 44, label: '40-44' },
+                { min: 45, max: 49, label: '45-49' },
+                { min: 50, max: 54, label: '50-54' },
+                { min: 55, max: 59, label: '55-59' },
+                { min: 60, max: 64, label: '60-64' },
+                { min: 65, max: 69, label: '65-69' },
+                // Adicione mais faixas etárias conforme necessário
+            ];
+
+            // Inicializar contagem para cada faixa etária
+            faixasEtarias.forEach(faixa => {
+                contagemPorFaixaEtaria[faixa.label] = 0;
+            });
+
+            // Loop através do conjunto de dados para contar cada faixa etária
             data.forEach(item => {
                 const idade = item.idade;
-                contagemPorIdade[idade] = (contagemPorIdade[idade] || 0) + 1;
+
+                // Encontrar a faixa etária correspondente
+                const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
+
+                // Incrementar a contagem para a faixa etária encontrada
+                if (faixa) {
+                    contagemPorFaixaEtaria[faixa.label]++;
+                }
             });
 
             // Converter o objeto em um array para usar no gráfico de barras
-            const dadosFormatados = Object.keys(contagemPorIdade).map(idade => ({
-                idade: parseInt(idade),
-                quantidade: contagemPorIdade[idade]
+            const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => ({
+                faixa: faixa,
+                quantidade: contagemPorFaixaEtaria[faixa]
             }));
 
-            // Organizar os dados por idade
-            dadosFormatados.sort((a, b) => a.idade - b.idade);
-
-            // Criar o gráfico de barras com base nas idades
+            // Criar o gráfico de barras com base nas faixas etárias
             google.charts.load('current', { 'packages': ['corechart'] });
             google.charts.setOnLoadCallback(function () {
                 const chartData = new google.visualization.DataTable();
-                chartData.addColumn('string', 'Idade');
+                chartData.addColumn('string', 'Faixa Etária');
                 chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.idade.toString(), item.quantidade]));
+                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
 
                 const options = {
-                title: 'Número de Registros por Idade',
-                legend: { position: 'none' },
+                    title: 'Número de Registros por Faixa Etária',
+                    legend: { position: 'none' },
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
                 };
 
-                const chart = new google.visualization.BarChart(document.getElementById('chart'));
+                const chart = new google.visualization.ColumnChart(document.getElementById('chart'));
                 chart.draw(chartData, options);
             });
-            }).fail(function (jqXHR, textStatus, msg) {
+        }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
-            });
+        });
     }
 
     function showGraficoPizzaIdade() {
         $.ajax({
-            url: 'http://localhost:3004/relatorio-fies/get-age',
-            type: 'get',
-            dataType: 'json',
+                url: 'http://localhost:3004/relatorio-fies/get-age',
+                type: 'get',
+                dataType: 'json',
             }).done(function (data) {
-            // Objeto para armazenar a contagem de cada idade
-            const contagemPorIdade = {};
+                // Objeto para armazenar a contagem de cada faixa etária
+                const contagemPorFaixaEtaria = {};
 
-            // Loop através do conjunto de dados para contar cada idade
-            data.forEach(item => {
-                const idade = item.idade;
-                contagemPorIdade[idade] = (contagemPorIdade[idade] || 0) + 1;
-            });
+                // Definir as faixas etárias desejadas
+                const faixasEtarias = [
+                    { min: 19, max: 24, label: '19-24' },
+                    { min: 25, max: 29, label: '25-29' },
+                    { min: 30, max: 34, label: '30-34' },
+                    { min: 35, max: 39, label: '35-39' },
+                    { min: 40, max: 44, label: '40-44' },
+                    { min: 45, max: 49, label: '45-49' },
+                    { min: 50, max: 54, label: '50-54' },
+                    { min: 55, max: 59, label: '55-59' },
+                    { min: 60, max: 64, label: '60-64' },
+                    { min: 65, max: 69, label: '65-69' },
+                    // Adicione mais faixas etárias conforme necessário
+                ];
 
-            // Converter o objeto em um array para usar no gráfico de pizza
-            const dadosFormatados = Object.keys(contagemPorIdade).map(idade => ({
-                idade: parseInt(idade),
-                quantidade: contagemPorIdade[idade]
-            }));
+                // Inicializar contagem para cada faixa etária
+                faixasEtarias.forEach(faixa => {
+                    contagemPorFaixaEtaria[faixa.label] = 0;
+                });
 
-            // Organizar os dados por idade
-            dadosFormatados.sort((a, b) => a.idade - b.idade);
+                // Loop através do conjunto de dados para contar cada faixa etária
+                data.forEach(item => {
+                    const idade = item.idade;
 
-            // Criar o gráfico de pizza com base nas idades
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(function () {
-                const chartData = new google.visualization.DataTable();
-                chartData.addColumn('string', 'Idade');
-                chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.idade.toString(), item.quantidade]));
+                    // Encontrar a faixa etária correspondente
+                    const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
 
-                const options = {
-                title: 'Número de Registros por Idade',
-                };
+                    // Incrementar a contagem para a faixa etária encontrada
+                    if (faixa) {
+                        contagemPorFaixaEtaria[faixa.label]++;
+                    }
+                });
 
-                const chart = new google.visualization.PieChart(document.getElementById('chart'));
-                chart.draw(chartData, options);
-            });
+                // Converter o objeto em um array para usar no gráfico de pizza
+                const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => ({
+                    faixa: faixa,
+                    quantidade: contagemPorFaixaEtaria[faixa]
+                }));
+
+                // Criar o gráfico de pizza com base nas faixas etárias
+                google.charts.load('current', { 'packages': ['corechart'] });
+                google.charts.setOnLoadCallback(function () {
+                    const chartData = new google.visualization.DataTable();
+                    chartData.addColumn('string', 'Faixa Etária');
+                    chartData.addColumn('number', 'Número de Registros');
+                    chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
+
+                    const options = {
+                        title: 'Número de Registros por Faixa Etária',
+                    };
+
+                    const chart = new google.visualization.PieChart(document.getElementById('chart'));
+                    chart.draw(chartData, options);
+                });
             }).fail(function (jqXHR, textStatus, msg) {
-            alert('Erro na requisição: ' + msg);
-            });
-
+                alert('Erro na requisição: ' + msg);
+            });   
     }  
-
-    function showGraficoCorRacial() {
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {  
-            var data = google.visualization.arrayToDataTable([
-            ['Task', 'Hours per Day'],
-            ['Work',     11],
-            ['Eat',      2],
-            ['Commute',  2],
-            ['Watch TV', 2],
-            ['Sleep',    7]
-            ]);
-
-            var options = {
-            title: 'Comparativo de cor racial'
-            };
-
-            var chart = new google.visualization.PieChart(document.getElementById('chart'));
-
-            chart.draw(data, options);
-        }
-    } 
 </script>
