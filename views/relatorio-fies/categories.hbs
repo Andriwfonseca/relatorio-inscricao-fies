@@ -28,9 +28,9 @@
         </div>
 
 
-        <div id="chart" class="" style="width: 100%; height: 500px;">
-            
+        <div id="chart" style="width: 100%; height: 500px;">            
         </div>        
+        <div id="legenda" class="legenda"></div>
 	</div>
 
 
@@ -139,18 +139,21 @@
                 chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
 
                 const options = {
-                    title: 'Número de Registros por Faixa Etária',
+                    title: 'Número de Registros por Faixa Etária de Idade',
                     curveType: 'function',
                     legend: { position: 'none' },
                 };
 
                 const chart = new google.visualization.LineChart(document.getElementById('chart'));
                 chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById('legenda');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
         });
-
     } 
 
     function showGraficoBarrasIdade() {
@@ -210,7 +213,7 @@
                 chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
 
                 const options = {
-                    title: 'Número de Registros por Faixa Etária',
+                    title: 'Número de Registros por Faixa Etária de Idade',
                     legend: { position: 'none' },
                     bars: 'vertical', // Tipo de gráfico de barras
                     bar: { groupWidth: '50%' }, // Espaçamento entre barras
@@ -218,6 +221,9 @@
 
                 const chart = new google.visualization.ColumnChart(document.getElementById('chart'));
                 chart.draw(chartData, options);
+                // Atualizar a legenda
+                const legenda = document.getElementById('legenda');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
@@ -281,11 +287,14 @@
                     chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
 
                     const options = {
-                        title: 'Número de Registros por Faixa Etária',
+                        title: 'Número de Registros por Faixa Etária de Idade',
                     };
 
                     const chart = new google.visualization.PieChart(document.getElementById('chart'));
                     chart.draw(chartData, options);
+                    // Atualizar a legenda
+                    const legenda = document.getElementById('legenda');
+                    legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
                 });
             }).fail(function (jqXHR, textStatus, msg) {
                 alert('Erro na requisição: ' + msg);
