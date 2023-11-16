@@ -62,12 +62,33 @@
   </tbody>
 </table>
 
+<div class="card-footer">
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Primeiro"
+            {{#if viewModel.buttons.notHasFirstPage}} disabled="disabled" {{/if}}
+            onclick="getRelatorioList(1)">
+            <i class="fas fa-angle-double-left"></i></button>
+        <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Anterior"
+            {{#if viewModel.buttons.notHasPreviousPage}} disabled="disabled" {{/if}}
+            onclick="getRelatorioList({{viewModel.pageInfo.previousPage}})">
+            <i class="fas fa-angle-left"></i></button>
+        <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Próximo"
+            {{#if viewModel.buttons.notHasNextPage}} disabled="disabled" {{/if}}
+            onclick="getRelatorioList({{viewModel.pageInfo.nextPage}})">
+            <i class="fas fa-angle-right"></i></button>
+        <button type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Último"
+            {{#if viewModel.buttons.notHasLastPage}} disabled="disabled" {{/if}}
+            onclick="getRelatorioList({{viewModel.pageInfo.lastPage}})">
+            <i class="fas fa-angle-double-right"></i></button>
+    </div>
+    <div style="float: right">{{viewModel.pageInfo.total}}
+        Dados do relatório (Página
+        {{viewModel.pageInfo.currentPage}} de
+        {{viewModel.pageInfo.totalPages}})</div>
+</div>
+
 <script>
-$(document).ready(function() {
-    var table = $('#table-relatorio').DataTable({
-        searchPanes: true
-    });
-    table.searchPanes.container().prependTo(table.table().container());
-    table.searchPanes.resizePanes();
-});
+  function getRelatorioList (page) {
+    window.location.href = prefix + '/relatorio-fies/view/list-table/' + page;
+  }
 </script>
