@@ -28,6 +28,27 @@ export class RelatorioFiesService {
             totalCount,
         };
     }
+
+    public async getAge() {
+        const data_nascimento = await this.prisma.inscricao_fies.findMany({
+            select: {
+              data_nascimento: true,
+              regiao_grupo_preferencia: true,
+            },
+            where: {
+              regiao_grupo_preferencia: "SUL",
+            },
+          });
+          
+          const data = data_nascimento.map(item => {
+            const anoNascimento = new Date(item.data_nascimento).getFullYear();
+            const idade = new Date().getFullYear() - anoNascimento;
+            return {
+              idade
+            };
+          });
+          return data;
+    }
     
     public async importCsvAndPopulateTable () {   
         console.log('Iniciando carregamento do csv');

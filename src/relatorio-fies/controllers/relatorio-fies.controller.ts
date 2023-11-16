@@ -20,6 +20,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.findAllPaginated(dto);
     }
 
+    @Get('get-age')
+    @ApiOperation({
+        summary: "Retorna um relatório de idades",
+        description: "Retorna um relatório de idades"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getAge () {
+        return this.relatorioFiesService.getAge();
+    }
+
     @Get('import-csv')
     @ApiOperation({
         summary: "Importa o csv e popula a tabela com os dados do csv",
