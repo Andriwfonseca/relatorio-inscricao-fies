@@ -29,14 +29,14 @@ export class RelatorioFiesService {
         };
     }
 
-    public async getAge() {
+    public async getAge(regiao: string) {
         const data_nascimento = await this.prisma.inscricao_fies.findMany({
             select: {
               data_nascimento: true,
               regiao_grupo_preferencia: true,
             },
             where: {
-              regiao_grupo_preferencia: "SUL",
+              regiao_grupo_preferencia: regiao,
             },
           });
           
@@ -48,6 +48,73 @@ export class RelatorioFiesService {
             };
           });
           return data;
+    }
+
+    public async getGenero(regiao: string) {
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                sexo: true,
+                regiao_grupo_preferencia: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+            },
+        });
+
+        return data;
+    }
+
+    public async getEtnia(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                etnia_cor: true,
+                regiao_grupo_preferencia: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+            },
+        });
+
+        return data;
+    }
+
+    public async getRendaFamiliar(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                renda_familiar_mensal_bruta: true,
+                regiao_grupo_preferencia: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+            },
+        });
+
+        return data;
+    }
+
+    public async getMelhoresNotasEtnia(etnia: string) {
+        const data = await this.prisma.inscricao_fies.groupBy({
+            by: ["regiao_grupo_preferencia"],
+            where: {
+                regiao_grupo_preferencia: {
+                in: ["SUL", "NORTE", "CENTRO-OESTE", "SUDESTE", "NORDESTE"],
+                },
+                media_nota_enem: {
+                gt: 650,
+                },
+                etnia_cor: etnia.toUpperCase()
+            },
+            _count: {
+                regiao_grupo_preferencia: true,
+            },
+            });     
+            
+        data.forEach((result) => {
+          console.log(`Região: ${result.regiao_grupo_preferencia}`);
+          console.log(`Quantidade: ${result._count.regiao_grupo_preferencia}`);
+        });     
+        
+        return data;
     }
     
     public async importCsvAndPopulateTable () {   

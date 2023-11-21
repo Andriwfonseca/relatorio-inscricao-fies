@@ -4,91 +4,82 @@
 		<!-- Titulo -->
 		<h1 class="main-title">Categorias - Insights</h1>
 
-		<div class="container">			
-			<input name="category-css" id="idade" type="radio" checked>
-			<input name="category-css" id="cor" type="radio">
-			<input name="category-css" id="renda-familiar" type="radio">
-			<input name="category-css" id="santa-catarina" type="radio">
-			<input name="category-css" id="escola-publica" type="radio">
-			
+		<div class="container">		
 			<ul class="list-category">
-				<li onclick="setInsightIdade()"><label for="idade">Idade</label></li>
-				<li onclick="showGraficoCorRacial()"><label for="cor">Cor Racial</label></li>
-				<li><label for="renda-familiar">Renda Familiar</label></li>
-				<li><label for="santa-catarina">Santa Catarina</label></li>
-				<li><label for="escola-publica">Escola Pública?</label></li>
+				<li onclick="showGraficoIdade()"><label class="button-default" for="idade">Idade</label></li>
+				<li onclick="showGraficoGenero()"><label class="button-default" for="genero">Gênero</label></li>
+				<li onclick="showGraficoEtnia()"><label class="button-default" for="etnia">Etnia</label></li>
+				<li onclick="showGraficoRenda()"><label class="button-default" for="renda-familiar">Renda Familiar</label></li>				
+				<li onclick="showGraficoPardosNotaEnem()"><label class="button-insight" for="nota-enem-etnia">Candidatos Com Melhores Nota Enem</label></li>
 			</ul>            
 		</div>
-
-        <div class="checkbox-container">
-            <!-- Checkbox para tipos de gráfico -->
-            <input type="checkbox" id="graficoLinha" onchange="showGrafico('linha')"> Linha
-            <input type="checkbox" id="graficoPizza" onchange="showGrafico('pizza')"> Pizza
-            <input type="checkbox" id="graficoBarras" onchange="showGrafico('barras')"> Barras
-        </div>
-
-
-        <div id="chart" style="width: 100%; height: 500px;">            
+        <div id="chart-sul" style="width: 100%; height: 500px;">            
         </div>        
-        <div id="legenda" class="legenda"></div>
+        <div id="legenda-sul" class="legenda"></div>
+        <div id="chart-norte" style="width: 100%; height: 500px;">            
+        </div>        
+        <div id="legenda-norte" class="legenda"></div>
+        <div id="chart-centro-oeste" style="width: 100%; height: 500px;">            
+        </div>        
+        <div id="legenda-centro-oeste" class="legenda"></div>
+        <div id="chart-nordeste" style="width: 100%; height: 500px;">            
+        </div>        
+        <div id="legenda-nordeste" class="legenda"></div>
+        <div id="chart-sudeste" style="width: 100%; height: 500px;">            
+        </div>        
+        <div id="legenda-sudeste" class="legenda"></div>
 	</div>
 
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <script type="text/javascript">
-    let insight = '';
-
-    function setInsightIdade() {
-        insight = 'idade';
-
-        const graficoLinha = document.getElementById('graficoLinha').checked;
-        const graficoPizza = document.getElementById('graficoPizza').checked;
-        const graficoBarras = document.getElementById('graficoBarras').checked; 
-
-        if (graficoLinha) {
-            showGraficoLinhasIdade();
-        } else if (graficoPizza) {
-            showGraficoPizzaIdade();
-        } else if (graficoBarras) {
-            showGraficoBarrasIdade();
-        }
+    function showGraficoPardosNotaEnem() {
+        getGraficoPardosNotaEnem("parda", "sul");
+        getGraficoPardosNotaEnem("branca", "norte");
+        getGraficoPardosNotaEnem("preta", "centro-oeste");
+        getGraficoPardosNotaEnem("amarela", "nordeste");
+        getGraficoPardosNotaEnem("indígena", "sudeste");
     }
     
-    function showGrafico(tipo) {
-        const graficoLinha = document.getElementById('graficoLinha').checked;
-        const graficoPizza = document.getElementById('graficoPizza').checked;
-        const graficoBarras = document.getElementById('graficoBarras').checked; 
-    
-        if (tipo === 'linha') {
-            document.getElementById('graficoPizza').checked = false;
-            document.getElementById('graficoBarras').checked = false;
-        } else if (tipo === 'pizza') {
-            document.getElementById('graficoLinha').checked = false;
-            document.getElementById('graficoBarras').checked = false;
-        } else if (tipo === 'barras') {
-            document.getElementById('graficoLinha').checked = false;
-            document.getElementById('graficoPizza').checked = false;
-        }
-
-        if(insight == 'idade'){
-            if (graficoLinha) {
-            showGraficoLinhasIdade();
-            } else if (graficoPizza) {
-                showGraficoPizzaIdade();
-            } else if (graficoBarras) {
-                showGraficoBarrasIdade();
-            }
-        }
-        
+    function showGraficoGenero() {
+        getGraficoGenero("sul");
+        getGraficoGenero("norte");
+        getGraficoGenero("centro-oeste");
+        getGraficoGenero("nordeste");
+        getGraficoGenero("sudeste");
     }
-    function showGraficoLinhasIdade() {
+
+    function showGraficoEtnia() {
+        getGraficoEtnia("sul");
+        getGraficoEtnia("norte");
+        getGraficoEtnia("centro-oeste");
+        getGraficoEtnia("nordeste");
+        getGraficoEtnia("sudeste");
+    }
+
+    function showGraficoIdade() {        
+        getGraficoIdade("sul");
+        getGraficoIdade("norte");
+        getGraficoIdade("centro-oeste");
+        getGraficoIdade("nordeste");
+        getGraficoIdade("sudeste");        
+    }
+
+    function showGraficoRenda() {
+        getGraficoRenda("sul");
+        getGraficoRenda("norte");
+        getGraficoRenda("centro-oeste");
+        getGraficoRenda("nordeste");
+        getGraficoRenda("sudeste");           
+    }
+    function getGraficoIdade(regiao) {
         $.ajax({
-            url: 'http://localhost:3004/relatorio-fies/get-age',
+            url: 'http://localhost:3004/relatorio-fies/get-age/' + regiao,
             type: 'get',
             dataType: 'json',
         }).done(function (data) {
-            // Objeto para armazenar a contagem de cada faixa etária
+            console.log(data, 'data')
             const contagemPorFaixaEtaria = {};
 
             // Definir as faixas etárias desejadas
@@ -99,84 +90,7 @@
                 { min: 35, max: 39, label: '35-39' },
                 { min: 40, max: 44, label: '40-44' },
                 { min: 45, max: 49, label: '45-49' },
-                { min: 50, max: 54, label: '50-54' },
-                { min: 55, max: 59, label: '55-59' },
-                { min: 60, max: 64, label: '60-64' },
-                { min: 65, max: 69, label: '65-69' },
-                // Adicione mais faixas etárias conforme necessário
-            ];
-
-            // Inicializar contagem para cada faixa etária
-            faixasEtarias.forEach(faixa => {
-                contagemPorFaixaEtaria[faixa.label] = 0;
-            });
-
-            // Loop através do conjunto de dados para contar cada faixa etária
-            data.forEach(item => {
-                const idade = item.idade;
-
-                // Encontrar a faixa etária correspondente
-                const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
-
-                // Incrementar a contagem para a faixa etária encontrada
-                if (faixa) {
-                    contagemPorFaixaEtaria[faixa.label]++;
-                }
-            });
-
-            // Converter o objeto em um array para usar no gráfico de linhas
-            const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => ({
-                faixa: faixa,
-                quantidade: contagemPorFaixaEtaria[faixa]
-            }));
-
-            // Criar o gráfico de linhas com base nas faixas etárias
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(function () {
-                const chartData = new google.visualization.DataTable();
-                chartData.addColumn('string', 'Faixa Etária');
-                chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
-
-                const options = {
-                    title: 'Número de Registros por Faixa Etária de Idade',
-                    curveType: 'function',
-                    legend: { position: 'none' },
-                };
-
-                const chart = new google.visualization.LineChart(document.getElementById('chart'));
-                chart.draw(chartData, options);
-
-                // Atualizar a legenda
-                const legenda = document.getElementById('legenda');
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
-            });
-        }).fail(function (jqXHR, textStatus, msg) {
-            alert('Erro na requisição: ' + msg);
-        });
-    } 
-
-    function showGraficoBarrasIdade() {
-        $.ajax({
-            url: 'http://localhost:3004/relatorio-fies/get-age',
-            type: 'get',
-            dataType: 'json',
-        }).done(function (data) {
-            // Objeto para armazenar a contagem de cada faixa etária
-            const contagemPorFaixaEtaria = {};
-
-            // Definir as faixas etárias desejadas
-            const faixasEtarias = [
-                { min: 19, max: 24, label: '19-24' },
-                { min: 25, max: 29, label: '25-29' },
-                { min: 30, max: 34, label: '30-34' },
-                { min: 35, max: 39, label: '35-39' },
-                { min: 40, max: 44, label: '40-44' },
-                { min: 45, max: 49, label: '45-49' },
-                { min: 50, max: 54, label: '50-54' },
-                { min: 55, max: 59, label: '55-59' },
-                { min: 60, max: 64, label: '60-64' },
-                { min: 65, max: 69, label: '65-69' },
+                { min: 50, max: 69, label: '50-69' }
                 // Adicione mais faixas etárias conforme necessário
             ];
 
@@ -213,16 +127,218 @@
                 chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
 
                 const options = {
-                    title: 'Número de Registros por Faixa Etária de Idade',
+                    title: 'Gráfico por Faixa Etária de Idade da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
                     legend: { position: 'none' },
                     bars: 'vertical', // Tipo de gráfico de barras
                     bar: { groupWidth: '50%' }, // Espaçamento entre barras
                 };
 
-                const chart = new google.visualization.ColumnChart(document.getElementById('chart'));
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
                 chart.draw(chartData, options);
                 // Atualizar a legenda
-                const legenda = document.getElementById('legenda');
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+            });
+        }).fail(function (jqXHR, textStatus, msg) {
+            alert('Erro na requisição: ' + msg);
+        });
+
+    }
+
+    function getGraficoGenero(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-genero/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            console.log(data, 'data');
+
+            const contagemPorGenero = {
+                'M': 0,
+                'F': 0
+            };
+
+            // Loop através do conjunto de dados para contar cada gênero
+            data.forEach(item => {
+                const genero = item.sexo;
+
+                // Incrementar a contagem para o gênero encontrado
+                if (contagemPorGenero.hasOwnProperty(genero)) {
+                    contagemPorGenero[genero]++;
+                }
+            });
+
+            // Mapear os valores dos gêneros para rótulos mais descritivos
+            const rotulosGenero = {
+                'M': 'Masculino',
+                'F': 'Feminino'
+            };
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = Object.keys(contagemPorGenero).map(genero => ({
+                genero: rotulosGenero[genero],
+                quantidade: contagemPorGenero[genero]
+            }));
+
+            // Criar o gráfico de barras com base nos gêneros
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Gênero');
+                chartData.addColumn('number', 'Número de Registros');
+                chartData.addRows(dadosFormatados.map(item => [item.genero, item.quantidade]));
+
+                const options = {
+                    title: 'Gráfico por Gênero na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    legend: { position: 'none' },
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.genero}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+            });
+        }).fail(function (jqXHR, textStatus, msg) {
+            alert('Erro na requisição: ' + msg);
+        });
+    }
+
+    function getGraficoEtnia(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-etnia/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorEtnia = {};
+
+            // Loop através do conjunto de dados para contar cada etnia
+            data.forEach(item => {
+                const etnia = item.etnia_cor;
+                // Incrementar a contagem para a etnia encontrada
+                if (!contagemPorEtnia.hasOwnProperty(etnia)) {
+                    contagemPorEtnia[etnia] = 0;
+                }
+
+                contagemPorEtnia[etnia]++;
+            });
+
+            // Mapear os valores das etnias para rótulos mais descritivos
+            // (Você pode ajustar conforme necessário)
+            const rotulosEtnia = {
+                'BRANCA': 'Branca',
+                'PRETA': 'Preta',
+                'PARDA': 'Parda',
+                'AMARELA': 'Amarela',
+                'INDÍGENA': 'Indígena'
+            };
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = Object.keys(rotulosEtnia).map(etnia => ({
+                etnia: rotulosEtnia[etnia],
+                quantidade: contagemPorEtnia[etnia] || 0
+            }));
+
+            // Criar o gráfico de barras com base nas etnias
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Etnia');
+                chartData.addColumn('number', 'Número de Registros');
+                chartData.addRows(dadosFormatados.map(item => [item.etnia, item.quantidade]));
+
+                const options = {
+                    title: 'Gráfico por Etnia na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    legend: { position: 'none' },
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.etnia}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+            });
+        }).fail(function (jqXHR, textStatus, msg) {
+            alert('Erro na requisição: ' + msg);
+        });
+    }
+
+    function getGraficoRenda(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-renda-familiar/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            console.log(data, 'data');
+            
+            const contagemPorFaixaRenda = {};
+
+            // Definir as faixas de renda desejadas
+            const faixasRenda = [
+                { min: 0, max: 1500, label: '0-1500' },
+                { min: 1501, max: 3000, label: '1501-3000' },
+                { min: 3001, max: 4500, label: '3001-4500' },
+                { min: 4501, max: 6000, label: '4501-6000' },
+                { min: 6001, max: 9000, label: '6001-9000' },
+                { min: 9001, max: 12000, label: '9001-12000' },
+                { min: 12001,max: 9999999, label: 'Acima de 12000' },
+            ];
+
+            // Inicializar contagem para cada faixa de renda
+            faixasRenda.forEach(faixa => {
+                contagemPorFaixaRenda[faixa.label] = 0;
+            });
+
+            // Loop através do conjunto de dados para contar cada faixa de renda
+            data.forEach(item => {
+                const renda = item.renda_familiar_mensal_bruta;
+
+                // Encontrar a faixa de renda correspondente
+                const faixa = faixasRenda.find(faixa => {
+                    if (renda !== null && renda >= faixa.min && renda <= faixa.max) {
+                        return true;
+                    } else if (renda === null && faixa.min === 0 && faixa.max === 500) {
+                        // Caso especial para lidar com valores nulos na primeira faixa
+                        return true;
+                    }
+                    return false;
+                });
+
+                // Incrementar a contagem para a faixa de renda encontrada
+                if (faixa) {
+                    contagemPorFaixaRenda[faixa.label]++;
+                }
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = Object.keys(contagemPorFaixaRenda).map(faixa => ({
+                faixa: faixa,
+                quantidade: contagemPorFaixaRenda[faixa]
+            }));
+
+            // Criar o gráfico de barras com base nas faixas de renda
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Faixa de Renda');
+                chartData.addColumn('number', 'Número de Registros');
+                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
+
+                const options = {
+                    title: 'Gráfico por Faixa de Renda Bruta da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    legend: { position: 'none' },
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
                 legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
@@ -230,74 +346,41 @@
         });
     }
 
-    function showGraficoPizzaIdade() {
+    function getGraficoPardosNotaEnem(etnia, regiao) {
         $.ajax({
-                url: 'http://localhost:3004/relatorio-fies/get-age',
-                type: 'get',
-                dataType: 'json',
-            }).done(function (data) {
-                // Objeto para armazenar a contagem de cada faixa etária
-                const contagemPorFaixaEtaria = {};
+            url: 'http://localhost:3004/relatorio-fies/get-melhores-notas-etnia/' + etnia,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            // Converter o formato do data para algo mais fácil de usar
+            const dadosFormatados = data.map(item => ({
+                regiao: item.regiao_grupo_preferencia,
+                quantidade: item._count ? item._count.regiao_grupo_preferencia : 0
+            }));
 
-                // Definir as faixas etárias desejadas
-                const faixasEtarias = [
-                    { min: 19, max: 24, label: '19-24' },
-                    { min: 25, max: 29, label: '25-29' },
-                    { min: 30, max: 34, label: '30-34' },
-                    { min: 35, max: 39, label: '35-39' },
-                    { min: 40, max: 44, label: '40-44' },
-                    { min: 45, max: 49, label: '45-49' },
-                    { min: 50, max: 54, label: '50-54' },
-                    { min: 55, max: 59, label: '55-59' },
-                    { min: 60, max: 64, label: '60-64' },
-                    { min: 65, max: 69, label: '65-69' },
-                    // Adicione mais faixas etárias conforme necessário
-                ];
+            // Criar o gráfico de barras com base nas regiões
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Região');
+                chartData.addColumn('number', 'Quantidade');
+                chartData.addRows(dadosFormatados.map(item => [item.regiao, item.quantidade]));
 
-                // Inicializar contagem para cada faixa etária
-                faixasEtarias.forEach(faixa => {
-                    contagemPorFaixaEtaria[faixa.label] = 0;
-                });
+                // Configurar as opções do gráfico
+                const options = {
+                    title: `Quantidade de Candidatos com Etnia ${etnia.charAt(0).toUpperCase()}${etnia.slice(1)} e com as Melhores Notas no ENEM por Região`,
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
+                };
 
-                // Loop através do conjunto de dados para contar cada faixa etária
-                data.forEach(item => {
-                    const idade = item.idade;
+                // Criar o gráfico de barras
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
 
-                    // Encontrar a faixa etária correspondente
-                    const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
-
-                    // Incrementar a contagem para a faixa etária encontrada
-                    if (faixa) {
-                        contagemPorFaixaEtaria[faixa.label]++;
-                    }
-                });
-
-                // Converter o objeto em um array para usar no gráfico de pizza
-                const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => ({
-                    faixa: faixa,
-                    quantidade: contagemPorFaixaEtaria[faixa]
-                }));
-
-                // Criar o gráfico de pizza com base nas faixas etárias
-                google.charts.load('current', { 'packages': ['corechart'] });
-                google.charts.setOnLoadCallback(function () {
-                    const chartData = new google.visualization.DataTable();
-                    chartData.addColumn('string', 'Faixa Etária');
-                    chartData.addColumn('number', 'Número de Registros');
-                    chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
-
-                    const options = {
-                        title: 'Número de Registros por Faixa Etária de Idade',
-                    };
-
-                    const chart = new google.visualization.PieChart(document.getElementById('chart'));
-                    chart.draw(chartData, options);
-                    // Atualizar a legenda
-                    const legenda = document.getElementById('legenda');
-                    legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
-                });
-            }).fail(function (jqXHR, textStatus, msg) {
-                alert('Erro na requisição: ' + msg);
-            });   
-    }  
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.regiao}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+            });
+        });        
+    }
 </script>
