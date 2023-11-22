@@ -71,6 +71,17 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getMelhoresNotasEtnia(etnia);
     }
 
+    
+    @Get('get-distribuicao-genero/:regiao')
+    @ApiOperation({
+        summary: "Retorna um relatório de distribuição de gênero",
+        description: "Retorna um relatório de distribuição de gênero"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getDistribuicaoGenero (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getDistribuicaoGenero(regiao);
+    }
+
     @Get('import-csv')
     @ApiOperation({
         summary: "Importa o csv e popula a tabela com os dados do csv",

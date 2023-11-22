@@ -30,7 +30,7 @@ export class RelatorioFiesService {
     }
 
     public async getAge(regiao: string) {
-        const data_nascimento = await this.prisma.inscricao_fies.findMany({
+        const data = await this.prisma.inscricao_fies.findMany({
             select: {
               data_nascimento: true,
               regiao_grupo_preferencia: true,
@@ -40,14 +40,14 @@ export class RelatorioFiesService {
             },
           });
           
-          const data = data_nascimento.map(item => {
+          const dataWithAge = data.map(item => {
             const anoNascimento = new Date(item.data_nascimento).getFullYear();
             const idade = new Date().getFullYear() - anoNascimento;
             return {
               idade
             };
           });
-          return data;
+          return dataWithAge;
     }
 
     public async getGenero(regiao: string) {
@@ -115,6 +115,29 @@ export class RelatorioFiesService {
         });     
         
         return data;
+    }
+
+    public async getDistribuicaoGenero(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+              data_nascimento: true,
+              sexo: true,
+              regiao_grupo_preferencia: true,
+            },
+            where: {
+              regiao_grupo_preferencia: regiao,
+            },
+          });
+          
+          const dataWithAge = data.map(item => {
+            const anoNascimento = new Date(item.data_nascimento).getFullYear();
+            const idade = new Date().getFullYear() - anoNascimento;
+            return {
+                sexo: item.sexo,
+                idade: idade
+            };
+          });
+          return dataWithAge;
     }
     
     public async importCsvAndPopulateTable () {   
