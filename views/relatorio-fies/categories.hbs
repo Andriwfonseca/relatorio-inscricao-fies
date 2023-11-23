@@ -89,7 +89,6 @@
             type: 'get',
             dataType: 'json',
         }).done(function (data) {
-            console.log(data, 'data')
             const contagemPorFaixaEtaria = {};
 
             // Definir as faixas etárias desejadas
@@ -122,11 +121,18 @@
                 }
             });
 
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
             // Converter o objeto em um array para usar no gráfico de barras
-            const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => ({
-                faixa: faixa,
-                quantidade: contagemPorFaixaEtaria[faixa]
-            }));
+            const dadosFormatados = Object.keys(contagemPorFaixaEtaria).map(faixa => {
+                const percentual = ((contagemPorFaixaEtaria[faixa] * 100) / totalRegistros).toFixed(2) + '%';
+                return {
+                    faixa: faixa,
+                    quantidade: contagemPorFaixaEtaria[faixa],
+                    percentual: percentual
+                };
+            });
 
             // Criar o gráfico de barras com base nas faixas etárias
             google.charts.load('current', { 'packages': ['corechart'] });
@@ -134,7 +140,8 @@
                 const chartData = new google.visualization.DataTable();
                 chartData.addColumn('string', 'Faixa Etária');
                 chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade, `${item.quantidade} (${item.percentual})`]));
 
                 const options = {
                     title: 'Gráfico por Faixa Etária de Idade da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
@@ -145,14 +152,16 @@
 
                 const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
                 chart.draw(chartData, options);
+
                 // Atualizar a legenda
                 const legenda = document.getElementById(`legenda-${regiao}`);
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade} (${item.percentual})</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
         });
     }
+
 
     function getGraficoGenero(regiao) {
         $.ajax({
@@ -160,8 +169,6 @@
             type: 'get',
             dataType: 'json',
         }).done(function (data) {
-            console.log(data, 'data');
-
             const contagemPorGenero = {
                 'M': 0,
                 'F': 0
@@ -177,6 +184,9 @@
                 }
             });
 
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
             // Mapear os valores dos gêneros para rótulos mais descritivos
             const rotulosGenero = {
                 'M': 'Masculino',
@@ -184,10 +194,14 @@
             };
 
             // Converter o objeto em um array para usar no gráfico de barras
-            const dadosFormatados = Object.keys(contagemPorGenero).map(genero => ({
-                genero: rotulosGenero[genero],
-                quantidade: contagemPorGenero[genero]
-            }));
+            const dadosFormatados = Object.keys(contagemPorGenero).map(genero => {
+                const percentual = ((contagemPorGenero[genero] * 100) / totalRegistros).toFixed(2) + '%';
+                return {
+                    genero: rotulosGenero[genero],
+                    quantidade: contagemPorGenero[genero],
+                    percentual: percentual
+                };
+            });
 
             // Criar o gráfico de barras com base nos gêneros
             google.charts.load('current', { 'packages': ['corechart'] });
@@ -195,7 +209,8 @@
                 const chartData = new google.visualization.DataTable();
                 chartData.addColumn('string', 'Gênero');
                 chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.genero, item.quantidade]));
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => [item.genero, item.quantidade, `${item.quantidade} (${item.percentual})`]));
 
                 const options = {
                     title: 'Gráfico por Gênero na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
@@ -208,12 +223,13 @@
                 chart.draw(chartData, options);
                 // Atualizar a legenda
                 const legenda = document.getElementById(`legenda-${regiao}`);
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.genero}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.genero}</strong>: <span class="legenda-quantidade">${item.quantidade} (${item.percentual})</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
         });
     }
+
 
     function getGraficoEtnia(regiao) {
         $.ajax({
@@ -226,6 +242,7 @@
             // Loop através do conjunto de dados para contar cada etnia
             data.forEach(item => {
                 const etnia = item.etnia_cor;
+
                 // Incrementar a contagem para a etnia encontrada
                 if (!contagemPorEtnia.hasOwnProperty(etnia)) {
                     contagemPorEtnia[etnia] = 0;
@@ -233,6 +250,9 @@
 
                 contagemPorEtnia[etnia]++;
             });
+
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
 
             // Mapear os valores das etnias para rótulos mais descritivos
             // (Você pode ajustar conforme necessário)
@@ -245,10 +265,14 @@
             };
 
             // Converter o objeto em um array para usar no gráfico de barras
-            const dadosFormatados = Object.keys(rotulosEtnia).map(etnia => ({
-                etnia: rotulosEtnia[etnia],
-                quantidade: contagemPorEtnia[etnia] || 0
-            }));
+            const dadosFormatados = Object.keys(rotulosEtnia).map(etnia => {
+                const percentual = ((contagemPorEtnia[etnia] || 0) * 100 / totalRegistros).toFixed(2) + '%';
+                return {
+                    etnia: rotulosEtnia[etnia],
+                    quantidade: contagemPorEtnia[etnia] || 0,
+                    percentual: percentual
+                };
+            });
 
             // Criar o gráfico de barras com base nas etnias
             google.charts.load('current', { 'packages': ['corechart'] });
@@ -256,7 +280,8 @@
                 const chartData = new google.visualization.DataTable();
                 chartData.addColumn('string', 'Etnia');
                 chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.etnia, item.quantidade]));
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => [item.etnia, item.quantidade, `${item.quantidade} (${item.percentual})`]));
 
                 const options = {
                     title: 'Gráfico por Etnia na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
@@ -267,14 +292,16 @@
 
                 const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
                 chart.draw(chartData, options);
+
                 // Atualizar a legenda
                 const legenda = document.getElementById(`legenda-${regiao}`);
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.etnia}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.etnia}</strong>: <span class="legenda-quantidade">${item.quantidade} (${item.percentual})</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
         });
     }
+
 
     function getGraficoRenda(regiao) {
         $.ajax({
@@ -282,8 +309,6 @@
             type: 'get',
             dataType: 'json',
         }).done(function (data) {
-            console.log(data, 'data');
-            
             const contagemPorFaixaRenda = {};
 
             // Definir as faixas de renda desejadas
@@ -294,7 +319,7 @@
                 { min: 4501, max: 6000, label: '4501-6000' },
                 { min: 6001, max: 9000, label: '6001-9000' },
                 { min: 9001, max: 12000, label: '9001-12000' },
-                { min: 12001,max: 9999999, label: 'Acima de 12000' },
+                { min: 12001, max: 9999999, label: 'Acima de 12000' },
             ];
 
             // Inicializar contagem para cada faixa de renda
@@ -323,11 +348,18 @@
                 }
             });
 
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
             // Converter o objeto em um array para usar no gráfico de barras
-            const dadosFormatados = Object.keys(contagemPorFaixaRenda).map(faixa => ({
-                faixa: faixa,
-                quantidade: contagemPorFaixaRenda[faixa]
-            }));
+            const dadosFormatados = Object.keys(contagemPorFaixaRenda).map(faixa => {
+                const percentual = ((contagemPorFaixaRenda[faixa] || 0) * 100 / totalRegistros).toFixed(2) + '%';
+                return {
+                    faixa: faixa,
+                    quantidade: contagemPorFaixaRenda[faixa] || 0,
+                    percentual: percentual
+                };
+            });
 
             // Criar o gráfico de barras com base nas faixas de renda
             google.charts.load('current', { 'packages': ['corechart'] });
@@ -335,7 +367,8 @@
                 const chartData = new google.visualization.DataTable();
                 chartData.addColumn('string', 'Faixa de Renda');
                 chartData.addColumn('number', 'Número de Registros');
-                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade]));
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => [item.faixa, item.quantidade, `${item.quantidade} (${item.percentual})`]));
 
                 const options = {
                     title: 'Gráfico por Faixa de Renda Bruta da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
@@ -346,14 +379,16 @@
 
                 const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
                 chart.draw(chartData, options);
+
                 // Atualizar a legenda
                 const legenda = document.getElementById(`legenda-${regiao}`);
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.faixa}</strong>: <span class="legenda-quantidade">${item.quantidade} (${item.percentual})</span>`).join(', ');
             });
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
         });
     }
+
 
     function getGraficoPardosNotaEnem(etnia, regiao) {        
         $.ajax({
@@ -367,13 +402,20 @@
                 quantidade: item._count ? item._count.regiao_grupo_preferencia : 0
             }));
 
+            // Calcular a quantidade total de candidatos
+            const totalCandidatos = dadosFormatados.reduce((total, item) => total + item.quantidade, 0);
+
             // Criar o gráfico de barras com base nas regiões
             google.charts.load('current', { 'packages': ['corechart'] });
             google.charts.setOnLoadCallback(function () {
                 const chartData = new google.visualization.DataTable();
                 chartData.addColumn('string', 'Região');
                 chartData.addColumn('number', 'Quantidade');
-                chartData.addRows(dadosFormatados.map(item => [item.regiao, item.quantidade]));
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => {
+                    const percentual = (item.quantidade / totalCandidatos * 100).toFixed(2) + '%';
+                    return [item.regiao, item.quantidade, percentual];
+                }));
 
                 // Configurar as opções do gráfico
                 const options = {
@@ -388,119 +430,131 @@
 
                 // Atualizar a legenda
                 const legenda = document.getElementById(`legenda-${regiao}`);
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.regiao}</strong>: <span class="legenda-quantidade">${item.quantidade}</span>`).join(', ');
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => {
+                    const percentual = (item.quantidade / totalCandidatos * 100).toFixed(2) + '%';
+                    return `<strong>${item.regiao}</strong>: <span class="legenda-quantidade">${item.quantidade} (${percentual})</span>`;
+                }).join(', ');
             });
         });        
     }
 
-    function getGraficoDistribuicaoGenero(regiao){
-        $.ajax({
-            url: 'http://localhost:3004/relatorio-fies/get-distribuicao-genero/' + regiao,
-            type: 'get',
-            dataType: 'json',
-        }).done(function (data) {    
-            const maxLength = data.length;     
-            const contagemPorFaixaEtariaGenero = {};
 
-            // Definir as faixas etárias desejadas
-            let faixasEtarias = [
-                { min: 19, max: 24, label: '19-24' },
-                { min: 25, max: 29, label: '25-29' },
-                { min: 30, max: 34, label: '30-34' },
-                { min: 35, max: 39, label: '35-39' },
-                { min: 40, max: 44, label: '40-44' },
-                { min: 45, max: 49, label: '45-49' },
-                { min: 50, max: 69, label: '50-69' }
-                // Adicione mais faixas etárias conforme necessário
-            ];
+    function getGraficoDistribuicaoGenero(regiao) {
+    $.ajax({
+        url: 'http://localhost:3004/relatorio-fies/get-distribuicao-genero/' + regiao,
+        type: 'get',
+        dataType: 'json',
+    }).done(function (data) {
+        const contagemPorFaixaEtariaGenero = {};
 
-            faixasEtarias  = faixasEtarias.map(item => {
-                const quantEstudantes = data.filter(estudante => (estudante.idade >= item.min && estudante.idade <= item.max)).length;
-                const percentual = ((quantEstudantes * 100) / maxLength);
-                console.log(item.label, 'label')
-                console.log(quantEstudantes, 'percentual')
-                return {
-                    min: item.min,
-                    max: item.max,
-                    label: item.label + ` (${Math.round(percentual)}%)`
-                }
-            });
+        // Definir as faixas etárias desejadas
+        let faixasEtarias = [
+            { min: 19, max: 24, label: '19-24' },
+            { min: 25, max: 29, label: '25-29' },
+            { min: 30, max: 34, label: '30-34' },
+            { min: 35, max: 39, label: '35-39' },
+            { min: 40, max: 44, label: '40-44' },
+            { min: 45, max: 49, label: '45-49' },
+            { min: 50, max: 69, label: '50-69' }
+            // Adicione mais faixas etárias conforme necessário
+        ];
 
-            // Definir os gêneros
-            const generos = ['M', 'F']; // Assume 'M' para Masculino e 'F' para Feminino
+        faixasEtarias = faixasEtarias.map(item => {
+            const quantEstudantes = data.filter(estudante => (estudante.idade >= item.min && estudante.idade <= item.max)).length;
 
-            // Inicializar contagem para cada faixa etária e gênero
-            faixasEtarias.forEach(faixa => {
-                contagemPorFaixaEtariaGenero[faixa.label] = {};
-                generos.forEach(genero => {
-                    contagemPorFaixaEtariaGenero[faixa.label][genero] = 0;
-                });
-            });
-
-            // Loop através do conjunto de dados para contar cada faixa etária e gênero
-            data.forEach(item => {
-                const idade = item.idade;
-                const genero = item.sexo; // Alterado de 'genero' para 'sexo' conforme o exemplo de retorno da API
-
-                // Encontrar a faixa etária correspondente
-                const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
-
-                // Incrementar a contagem para a faixa etária e gênero encontrados
-                if (faixa && genero) {
-                    contagemPorFaixaEtariaGenero[faixa.label][genero]++;
-                }
-            });
-
-            // Converter o objeto em um array para usar no gráfico de barras
-            const dadosFormatados = [];
-            faixasEtarias.forEach(faixa => {
-                generos.forEach(genero => {
-                    dadosFormatados.push({
-                        faixa: faixa.label,
-                        genero: genero,
-                        quantidade: contagemPorFaixaEtariaGenero[faixa.label][genero]
-                    });
-                });
-            });
-
-            // Criar o gráfico de barras com base nas faixas etárias e gêneros
-            google.charts.load('current', { 'packages': ['corechart'] });
-            google.charts.setOnLoadCallback(function () {
-                const chartData = new google.visualization.DataTable();
-                chartData.addColumn('string', 'Faixa Etária');
-                chartData.addColumn('number', 'Masculino');
-                chartData.addColumn('number', 'Feminino');
-
-                // Adicionar dados ao DataTable
-                faixasEtarias.forEach(faixa => {
-                    const dadosFaixa = dadosFormatados.filter(item => item.faixa === faixa.label);
-                    const row = [faixa.label];
-                    generos.forEach(genero => {
-                        const dadoGenero = dadosFaixa.find(item => item.genero === genero);
-                        row.push(dadoGenero ? dadoGenero.quantidade : 0);
-                    });
-                    chartData.addRows([row]);
-                });
-
-                const options = {
-                    title: 'Gráfico por Faixa Etária e Gênero da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
-                    bars: 'group',
-                    hAxis: { title: 'Faixa Etária' },
-                    vAxis: { title: 'Número de Registros' }
-                };
-
-                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
-                chart.draw(chartData, options);
-
-                // Atualizar a legenda
-                const legenda = document.getElementById(`legenda-${regiao}`);
-                legenda.innerHTML = '<strong>Legenda:</strong> ' + generos.map(genero => {
-                    const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
-                    return `<strong>${genero}</strong>: ${totalGenero}`;
-                }).join(', ');
-            });
-        }).fail(function (jqXHR, textStatus, msg) {
-            alert('Erro na requisição: ' + msg);
+            return {
+                min: item.min,
+                max: item.max,
+                label: item.label,
+                quantidade: quantEstudantes
+            };
         });
-    }
+
+        // Definir os gêneros
+        const generos = ['M', 'F']; // Assume 'M' para Masculino e 'F' para Feminino
+
+        // Inicializar contagem para cada faixa etária e gênero
+        faixasEtarias.forEach(faixa => {
+            contagemPorFaixaEtariaGenero[faixa.label] = {};
+            generos.forEach(genero => {
+                contagemPorFaixaEtariaGenero[faixa.label][genero] = 0;
+            });
+        });
+
+        // Loop através do conjunto de dados para contar cada faixa etária e gênero
+        data.forEach(item => {
+            const idade = item.idade;
+            const genero = item.sexo; // Alterado de 'genero' para 'sexo' conforme o exemplo de retorno da API
+
+            // Encontrar a faixa etária correspondente
+            const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
+
+            // Incrementar a contagem para a faixa etária e gênero encontrados
+            if (faixa && genero) {
+                contagemPorFaixaEtariaGenero[faixa.label][genero]++;
+            }
+        });
+
+        // Converter o objeto em um array para usar no gráfico de barras
+        const dadosFormatados = [];
+        faixasEtarias.forEach(faixa => {
+            generos.forEach(genero => {
+                dadosFormatados.push({
+                    faixa: faixa.label,
+                    genero: genero,
+                    quantidade: contagemPorFaixaEtariaGenero[faixa.label][genero]
+                });
+            });
+        });
+
+        // Calcular a quantidade total de estudantes
+        const totalEstudantes = data.length;
+
+        // Criar o gráfico de barras com base nas faixas etárias e gêneros
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(function () {
+            const chartData = new google.visualization.DataTable();
+            chartData.addColumn('string', 'Faixa Etária');
+
+            // Adicionar colunas para cada gênero
+            generos.forEach(genero => {
+                chartData.addColumn('number', genero);
+                chartData.addColumn({ type: 'string', role: 'annotation' });
+            });
+
+            // Adicionar dados ao DataTable
+            faixasEtarias.forEach(faixa => {
+                const dadosFaixa = dadosFormatados.filter(item => item.faixa === faixa.label);
+                const row = [faixa.label];
+                generos.forEach(genero => {
+                    const dadoGenero = dadosFaixa.find(item => item.genero === genero);
+                    const percentual = ((dadoGenero ? dadoGenero.quantidade : 0) * 100 / totalEstudantes).toFixed(2) + '%';
+                    row.push(dadoGenero ? dadoGenero.quantidade : 0, percentual);
+                });
+                chartData.addRows([row]);
+            });
+
+            const options = {
+                title: 'Gráfico por Faixa Etária e Gênero da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                bars: 'group',
+                hAxis: { title: 'Faixa Etária' },
+                vAxis: { title: 'Número de Registros' }
+            };
+
+            const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+            chart.draw(chartData, options);
+
+            // Atualizar a legenda
+            const legenda = document.getElementById(`legenda-${regiao}`);
+            legenda.innerHTML = '<strong>Legenda:</strong> ' + generos.map(genero => {
+                const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
+                const percentualGenero = (totalGenero * 100 / totalEstudantes).toFixed(2) + '%';
+                return `<strong>${genero}</strong>: ${totalGenero} (${percentualGenero})`;
+            }).join(', ');
+        });
+    }).fail(function (jqXHR, textStatus, msg) {
+        alert('Erro na requisição: ' + msg);
+    });
+}
+
 </script>
