@@ -92,6 +92,33 @@ export class RelatorioFiesService {
         return data;
     }
 
+    public async getRendaPerCapta(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                renda_familiar_mensal_bruta: true,
+                regiao_grupo_preferencia: true,
+                data_nascimento: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+                renda_familiar_mensal_bruta: {
+                    lt: 5000
+                }
+            },
+        });
+
+        const dataWithAge = data.map(item => {
+            const anoNascimento = new Date(item.data_nascimento).getFullYear();
+            const idade = new Date().getFullYear() - anoNascimento;
+            return {
+                renda_per_capta: item.renda_familiar_mensal_bruta,
+                regiao: item.regiao_grupo_preferencia,
+                idade: idade
+            };
+          });
+          return dataWithAge;
+    }
+
     public async getMelhoresNotasEtnia(etnia: string) {
         const data = await this.prisma.inscricao_fies.groupBy({
             by: ["regiao_grupo_preferencia"],

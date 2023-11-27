@@ -51,6 +51,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getRendaFamiliar(regiao);
     }
 
+    @Get('get-idade-renda-percapta/:regiao')
+    @ApiOperation({
+        summary: "Retorna um relatório trazendo idade e renda per capta dos inscritos",
+        description: "Retorna um relatório trazendo idade e renda per capta dos inscritos"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getRendaPerCapta (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getRendaPerCapta(regiao);
+    }
+
     @Get('get-etnia/:regiao')
     @ApiOperation({
         summary: "Retorna um relatório de etnia",
