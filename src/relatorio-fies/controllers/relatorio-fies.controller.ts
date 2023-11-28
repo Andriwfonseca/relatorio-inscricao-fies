@@ -71,6 +71,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getEtnia(regiao);
     }
 
+    @Get('get-ensino-medio-faixa-ano-etnia/:regiao')
+    @ApiOperation({
+        summary: "Retorna um relatório ano de conclusão do ensino média por etnia",
+        description: "Retorna um relatório ano de conclusão do ensino média por etnia"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getAnoEnsinoMediaEtnia (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getAnoEnsinoMediaEtnia(regiao);
+    }
+
     @Get('get-melhores-notas-etnia/:etnia')
     @ApiOperation({
         summary: "Retorna a quantidade de candidatos com melhores notas do enem por região",

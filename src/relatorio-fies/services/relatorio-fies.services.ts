@@ -166,6 +166,21 @@ export class RelatorioFiesService {
           });
           return dataWithAge;
     }
+
+    public async getAnoEnsinoMediaEtnia(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                etnia_cor: true,
+                ano_conclusao_ensino_medio: true,
+                regiao_grupo_preferencia: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+            },
+          });
+          
+          return data;
+    }
     
     public async importCsvAndPopulateTable () {   
         console.log('Iniciando carregamento do csv');
