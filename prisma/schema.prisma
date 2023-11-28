@@ -36,4 +36,9 @@ model inscricao_fies {
   percentual_financiamento      Float?    @db.Float
   semestre_financiamento        Int?
   qtde_semestre_financiado      Int?
+  matematica_tecnologias        Float?    @db.Float
+  linguagens_codigos_tec        Float?    @db.Float
+  ciencias_natureza_tec         Float?    @db.Float
+  ciencias_humanas_tec          Float?    @db.Float
+  renda_mensal_bruta_per_capta  Float?    @db.Float
 }

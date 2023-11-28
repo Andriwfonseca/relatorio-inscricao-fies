@@ -364,6 +364,11 @@ export class RelatorioFiesService {
                         percentual_financiamento: item.Percentualdefinanciamento !== '' ? parseFloat(item.Percentualdefinanciamento) : null,
                         semestre_financiamento: item.Semestredofinanciamento !== ' ' ? parseInt(item.Semestredofinanciamento) : null,
                         qtde_semestre_financiado: item.Qtdesemestrefinanciado !== ' ' ? parseInt(item.Qtdesemestrefinanciado) : null,
+                        matematica_tecnologias: parseFloat(item['MatemáticaesuasTecnologias'].replace(',', '.')),
+                        linguagens_codigos_tec: parseFloat(item['Linguagens,CódigosesuasTec'].replace(',', '.')),
+                        ciencias_natureza_tec: parseFloat(item['CiênciasNaturezaesuasTec'].replace(',', '.')),
+                        ciencias_humanas_tec: parseFloat(item['CiênciasHumanasesuasTec'].replace(',', '.')),
+                        renda_mensal_bruta_per_capta: parseFloat(item['Rendamensalbrutapercapita'].replace(',', '.')),
                     }
                 });
                 count++;
