@@ -15,7 +15,9 @@
 				<li onclick="showGraficoMediaIdadeRendaPerCapta()"><label class="button-insight" for="media-idade-renda-per-capta">Média da idade dos Candidatos por Renda per Capita</label></li>
 				<li onclick="showGraficoEnsinoMedioPorFaixaDeAnoEEtnia()"><label class="button-insight" for="ensino-medio-faixa-ano-etnia">Ensino Médio por Faixa de Ano e Etnia</label></li>
 				<li onclick="showGraficoQtdPcdEtnia()"><label class="button-insight" for="pcd-etnia">Pessoas Com Deficiência por Etnia</label></li>
-				<li onclick="showGraficoCandidatosPcdGenero()"><label class="button-insight" for="pcd-genero">Pessoas Com Deficiência por Gênero</label></li>
+				<li onclick="showGraficoCandidatosPcdGenero()"><label class="button-insight" for="pcd-genero">Pessoas Com Deficiência por Gênero e Idade</label></li>
+				<li onclick="showGraficoEtniaArea()"><label class="button-insight" for="pcd-area">Pessoas Com Deficiência por Área</label></li>
+				<li onclick="showGraficoGeneroArea()"><label class="button-insight" for="genero-area">Candidatos por Gênero por Área</label></li>
 
 			</ul>            
 		</div>
@@ -54,6 +56,14 @@
         getGraficoDistribuicaoGenero("centro-oeste");
         getGraficoDistribuicaoGenero("nordeste");
         getGraficoDistribuicaoGenero("sudeste");
+    }
+
+    function showGraficoGeneroArea() {
+        getGraficoGeneroArea("sul");
+        getGraficoGeneroArea("norte");
+        getGraficoGeneroArea("centro-oeste");
+        getGraficoGeneroArea("nordeste");
+        getGraficoGeneroArea("sudeste");
     }
 
     function showGraficoEtniaNotaEnem() {
@@ -118,6 +128,14 @@
         getGraficoMediaIdadeRendaPerCapita("centro-oeste");
         getGraficoMediaIdadeRendaPerCapita("nordeste");
         getGraficoMediaIdadeRendaPerCapita("sudeste");  
+    }
+
+    function showGraficoEtniaArea() {
+        getGraficoEtniaArea("sul");
+        getGraficoEtniaArea("norte");
+        getGraficoEtniaArea("centro-oeste");
+        getGraficoEtniaArea("nordeste");
+        getGraficoEtniaArea("sudeste");  
     }
 
     function getGraficoIdade(regiao) {
@@ -939,4 +957,102 @@
             });
         });
     }
+
+    function getGraficoEtniaArea(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-pcd-area-sub-area/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorEtniaArea = {};
+
+            // Inicializar contagem para cada etnia e área
+            data.forEach(item => {
+                const etnia = item.etnia_cor;
+                const area = item.area_conhecimento;
+
+                if (!contagemPorEtniaArea[etnia]) {
+                    contagemPorEtniaArea[etnia] = {};
+                }
+
+                if (!contagemPorEtniaArea[etnia][area]) {
+                    contagemPorEtniaArea[etnia][area] = 0;
+                }
+
+                contagemPorEtniaArea[etnia][area]++;
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = [];
+            Object.keys(contagemPorEtniaArea).forEach(etnia => {
+                Object.keys(contagemPorEtniaArea[etnia]).forEach(area => {
+                    dadosFormatados.push({
+                        etnia: etnia,
+                        area: area,
+                        quantidade: contagemPorEtniaArea[etnia][area]
+                    });
+                });
+            });
+
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
+            // Criar o gráfico de barras empilhadas com base em etnia e área
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Etnia');
+
+                // Adicionar colunas para cada área
+                const areas = [...new Set(dadosFormatados.map(item => item.area))];
+                areas.forEach((area, index) => {
+                    chartData.addColumn('number', area);
+                    if (index === 0) {
+                        chartData.addColumn({ type: 'string', role: 'annotation' });
+                    }
+                });
+
+                // Adicionar dados ao DataTable
+                const linhas = [];
+                Object.keys(contagemPorEtniaArea).forEach(etnia => {
+                    const dadosEtnia = dadosFormatados.filter(item => item.etnia === etnia);
+                    const linha = [etnia];
+
+                    areas.forEach((area, index) => {
+                        const dadoArea = dadosEtnia.find(item => item.area === area);
+                        linha.push(dadoArea ? dadoArea.quantidade : 0);
+                        if (index === 0) {
+                            const percentual = ((dadosEtnia.reduce((total, item) => total + item.quantidade, 0) * 100) / totalRegistros).toFixed(2) + '%';
+                            linha.push(percentual);
+                        }
+                    });
+
+                    linhas.push(linha);
+                });
+
+                chartData.addRows(linhas);
+
+                const options = {
+                    title: 'Gráfico por Etnia e Área da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    isStacked: true,
+                    hAxis: { title: 'Etnia' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + Object.keys(contagemPorEtniaArea).map(etnia => {
+                    const totalEtnia = dadosFormatados.filter(item => item.etnia === etnia).reduce((total, item) => total + item.quantidade, 0);
+                    return `<strong>${etnia}</strong>: ${totalEtnia}`;
+                }).join(', ');
+            });
+        });
+    }
+
+
+
+
 </script>
