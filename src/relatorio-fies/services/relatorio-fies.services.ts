@@ -219,6 +219,29 @@ export class RelatorioFiesService {
           return data;
     }
 
+    public async getCursoSuperiorGenero(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                sexo: true,
+                data_nascimento: true
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+                concluiu_curso_superior: "Sim"
+            },
+          });
+          
+          const dataWithAge = data.map(item => {
+            const anoNascimento = new Date(item.data_nascimento).getFullYear();
+            const idade = new Date().getFullYear() - anoNascimento;
+            return {
+                sexo: item.sexo,
+                idade: idade
+            };
+          });
+          return dataWithAge;
+    }
+
     public async getSituacaoInscricaoEtnia(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({
             select: {

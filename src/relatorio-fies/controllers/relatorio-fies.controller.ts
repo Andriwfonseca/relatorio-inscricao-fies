@@ -161,6 +161,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getSituacaoInscricaoEtnia(regiao);
     }
 
+    @Get('get-curso-superior-genero/:regiao')
+    @ApiOperation({
+        summary: "Retorna a quantidade de candidatos que concluiram curso superior por gênero",
+        description: "Retorna a quantidade de candidatos que concluiram curso superior por gênero"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getCursoSuperiorGenero (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getCursoSuperiorGenero(regiao);
+    }
+
     
     @Get('get-distribuicao-genero/:regiao')
     @ApiOperation({

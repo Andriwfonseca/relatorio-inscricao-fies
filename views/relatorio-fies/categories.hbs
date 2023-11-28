@@ -21,6 +21,7 @@
 				<li onclick="showGraficoSituacaoInscricaoPcd()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos com PCD</label></li>
 				<li onclick="showGraficoSituacaoInscricaoGenero()"><label class="button-insight" for="situacao-inscricao-genero">Situação das Inscrições dos Candidatos por Gênero</label></li>
 				<li onclick="showGraficoSituacaoInscricaoEtnia()"><label class="button-insight" for="situacao-inscricao-etnia">Situação das Inscrições dos Candidatos por Etnia</label></li>
+				<li onclick="showGraficoGeneroCursoSuperior()"><label class="button-insight" for="genero-curso-superior">Curso Superior Concluído por Gênero</label></li>
 
 			</ul>            
 		</div>
@@ -51,6 +52,14 @@
         getGraficoSituacaoInscricaoPcd("centro-oeste");
         getGraficoSituacaoInscricaoPcd("nordeste");
         getGraficoSituacaoInscricaoPcd("sudeste");
+    }
+
+    function showGraficoGeneroCursoSuperior() {
+        getGraficoGeneroCursoSuperior("sul");
+        getGraficoGeneroCursoSuperior("norte");
+        getGraficoGeneroCursoSuperior("centro-oeste");
+        getGraficoGeneroCursoSuperior("nordeste");
+        getGraficoGeneroCursoSuperior("sudeste");
     }
 
     function showGraficoSituacaoInscricaoEtnia() {
@@ -1331,105 +1340,218 @@
     }
 
     function getGraficoSituacaoInscricaoEtnia(regiao) {
-    $.ajax({
-        url: 'http://localhost:3004/relatorio-fies/get-etnia-situacao-incricao/' + regiao,
-        type: 'get',
-        dataType: 'json',
-    }).done(function (data) {
-        const contagemPorSituacaoEtnia = {};
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-etnia-situacao-incricao/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorSituacaoEtnia = {};
 
-        // Inicializar contagem para cada situação de inscrição e etnia
-        data.forEach(item => {
-            const situacao = item.situacao_inscricao_fies;
-            const etnia = item.etnia_cor;
+            // Inicializar contagem para cada situação de inscrição e etnia
+            data.forEach(item => {
+                const situacao = item.situacao_inscricao_fies;
+                const etnia = item.etnia_cor;
 
-            if (!contagemPorSituacaoEtnia[situacao]) {
-                contagemPorSituacaoEtnia[situacao] = {};
-            }
+                if (!contagemPorSituacaoEtnia[situacao]) {
+                    contagemPorSituacaoEtnia[situacao] = {};
+                }
 
-            if (!contagemPorSituacaoEtnia[situacao][etnia]) {
-                contagemPorSituacaoEtnia[situacao][etnia] = 0;
-            }
+                if (!contagemPorSituacaoEtnia[situacao][etnia]) {
+                    contagemPorSituacaoEtnia[situacao][etnia] = 0;
+                }
 
-            contagemPorSituacaoEtnia[situacao][etnia]++;
-        });
-
-        // Converter o objeto em um array para usar no gráfico de barras
-        const dadosFormatados = [];
-        Object.keys(contagemPorSituacaoEtnia).forEach(situacao => {
-            Object.keys(contagemPorSituacaoEtnia[situacao]).forEach(etnia => {
-                dadosFormatados.push({
-                    situacao: situacao,
-                    etnia: etnia,
-                    quantidade: contagemPorSituacaoEtnia[situacao][etnia]
-                });
-            });
-        });
-
-        // Calcular a quantidade total de registros
-        const totalRegistros = data.length;
-
-        // Criar o gráfico de barras agrupadas com base na situação de inscrição e etnia
-        google.charts.load('current', { 'packages': ['corechart'] });
-        google.charts.setOnLoadCallback(function () {
-            const chartData = new google.visualization.DataTable();
-            chartData.addColumn('string', 'Situação de Inscrição');
-
-            // Adicionar colunas para cada etnia
-            const etnias = [...new Set(dadosFormatados.map(item => item.etnia))];
-            etnias.forEach(etnia => {
-                chartData.addColumn('number', etnia);
-                chartData.addColumn({ type: 'string', role: 'annotation' });
+                contagemPorSituacaoEtnia[situacao][etnia]++;
             });
 
-            // Verificar o número correto de colunas no DataTable
-            const numColunasDataTable = etnias.length * 2 + 1;
-            
-            // Verificar se o número de colunas está correto
-            if (chartData.getNumberOfColumns() !== numColunasDataTable) {
-                console.error('Erro: Número incorreto de colunas no DataTable.');
-                return;
-            }
-
-            // Adicionar dados ao DataTable
-            const linhas = [];
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = [];
             Object.keys(contagemPorSituacaoEtnia).forEach(situacao => {
-                const dadosSituacao = dadosFormatados.filter(item => item.situacao === situacao);
-                const linha = [situacao];
-
-                etnias.forEach(etnia => {
-                    const dadoEtnia = dadosSituacao.find(item => item.etnia === etnia);
-                    const percentual = ((dadoEtnia ? dadoEtnia.quantidade : 0) * 100 / totalRegistros).toFixed(2) + '%';
-                    linha.push(dadoEtnia ? dadoEtnia.quantidade : 0, percentual);
+                Object.keys(contagemPorSituacaoEtnia[situacao]).forEach(etnia => {
+                    dadosFormatados.push({
+                        situacao: situacao,
+                        etnia: etnia,
+                        quantidade: contagemPorSituacaoEtnia[situacao][etnia]
+                    });
                 });
-
-                linhas.push(linha);
             });
 
-            chartData.addRows(linhas);
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
 
-            const options = {
-                title: 'Gráfico por Situação de Inscrição FIES Separado por Etnia na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
-                isStacked: true,
-                hAxis: { title: 'Situação de Inscrição' },
-                vAxis: { title: 'Número de Registros' }
-            };
+            // Criar o gráfico de barras agrupadas com base na situação de inscrição e etnia
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Situação de Inscrição');
 
-            const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
-            chart.draw(chartData, options);
+                // Adicionar colunas para cada etnia
+                const etnias = [...new Set(dadosFormatados.map(item => item.etnia))];
+                etnias.forEach(etnia => {
+                    chartData.addColumn('number', etnia);
+                    chartData.addColumn({ type: 'string', role: 'annotation' });
+                });
 
-            // Atualizar a legenda
-            const legenda = document.getElementById(`legenda-${regiao}`);
-            legenda.innerHTML = '<strong>Legenda:</strong> ' + etnias.map(etnia => {
-                const totalEtnia = dadosFormatados.filter(item => item.etnia === etnia).reduce((total, item) => total + item.quantidade, 0);
-                const percentualEtnia = (totalEtnia * 100 / totalRegistros).toFixed(2) + '%';
-                return `<strong>${etnia}</strong>: ${totalEtnia} (${percentualEtnia})`;
-            }).join(', ');
+                // Verificar o número correto de colunas no DataTable
+                const numColunasDataTable = etnias.length * 2 + 1;
+                
+                // Verificar se o número de colunas está correto
+                if (chartData.getNumberOfColumns() !== numColunasDataTable) {
+                    console.error('Erro: Número incorreto de colunas no DataTable.');
+                    return;
+                }
+
+                // Adicionar dados ao DataTable
+                const linhas = [];
+                Object.keys(contagemPorSituacaoEtnia).forEach(situacao => {
+                    const dadosSituacao = dadosFormatados.filter(item => item.situacao === situacao);
+                    const linha = [situacao];
+
+                    etnias.forEach(etnia => {
+                        const dadoEtnia = dadosSituacao.find(item => item.etnia === etnia);
+                        const percentual = ((dadoEtnia ? dadoEtnia.quantidade : 0) * 100 / totalRegistros).toFixed(2) + '%';
+                        linha.push(dadoEtnia ? dadoEtnia.quantidade : 0, percentual);
+                    });
+
+                    linhas.push(linha);
+                });
+
+                chartData.addRows(linhas);
+
+                const options = {
+                    title: 'Gráfico por Situação de Inscrição FIES Separado por Etnia na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    isStacked: true,
+                    hAxis: { title: 'Situação de Inscrição' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + etnias.map(etnia => {
+                    const totalEtnia = dadosFormatados.filter(item => item.etnia === etnia).reduce((total, item) => total + item.quantidade, 0);
+                    const percentualEtnia = (totalEtnia * 100 / totalRegistros).toFixed(2) + '%';
+                    return `<strong>${etnia}</strong>: ${totalEtnia} (${percentualEtnia})`;
+                }).join(', ');
+            });
         });
-    });
-}
+    }
 
+    function getGraficoGeneroCursoSuperior(regiao) {
+            $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-curso-superior-genero/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorFaixaEtariaGenero = {};
+            console.log(data, 'data')
+            // Definir as faixas etárias desejadas
+            let faixasEtarias = [
+                { min: 19, max: 24, label: '19-24' },
+                { min: 25, max: 29, label: '25-29' },
+                { min: 30, max: 34, label: '30-34' },
+                { min: 35, max: 39, label: '35-39' },
+                { min: 40, max: 44, label: '40-44' },
+                { min: 45, max: 49, label: '45-49' },
+                { min: 50, max: 69, label: '50-69' }
+            ];
 
+            faixasEtarias = faixasEtarias.map(item => {
+                const quantEstudantes = data.filter(estudante => (estudante.idade >= item.min && estudante.idade <= item.max)).length;
+
+                return {
+                    min: item.min,
+                    max: item.max,
+                    label: item.label,
+                    quantidade: quantEstudantes
+                };
+            });
+
+            // Definir os gêneros
+            const generos = ['M', 'F']; // Assume 'M' para Masculino e 'F' para Feminino
+
+            // Inicializar contagem para cada faixa etária e gênero
+            faixasEtarias.forEach(faixa => {
+                contagemPorFaixaEtariaGenero[faixa.label] = {};
+                generos.forEach(genero => {
+                    contagemPorFaixaEtariaGenero[faixa.label][genero] = 0;
+                });
+            });
+
+            // Loop através do conjunto de dados para contar cada faixa etária e gênero
+            data.forEach(item => {
+                const idade = item.idade;
+                const genero = item.sexo; // Alterado de 'genero' para 'sexo' conforme o exemplo de retorno da API
+
+                // Encontrar a faixa etária correspondente
+                const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
+
+                // Incrementar a contagem para a faixa etária e gênero encontrados
+                if (faixa && genero) {
+                    contagemPorFaixaEtariaGenero[faixa.label][genero]++;
+                }
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = [];
+            faixasEtarias.forEach(faixa => {
+                generos.forEach(genero => {
+                    dadosFormatados.push({
+                        faixa: faixa.label,
+                        genero: genero,
+                        quantidade: contagemPorFaixaEtariaGenero[faixa.label][genero]
+                    });
+                });
+            });
+
+            // Calcular a quantidade total de estudantes
+            const totalEstudantes = data.length;
+
+            // Criar o gráfico de barras com base nas faixas etárias e gêneros
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Faixa Etária');
+
+                // Adicionar colunas para cada gênero
+                generos.forEach(genero => {
+                    chartData.addColumn('number', genero);
+                    chartData.addColumn({ type: 'string', role: 'annotation' });
+                });
+
+                // Adicionar dados ao DataTable
+                faixasEtarias.forEach(faixa => {
+                    const dadosFaixa = dadosFormatados.filter(item => item.faixa === faixa.label);
+                    const row = [faixa.label];
+                    generos.forEach(genero => {
+                        const dadoGenero = dadosFaixa.find(item => item.genero === genero);
+                        const percentual = ((dadoGenero ? dadoGenero.quantidade : 0) * 100 / totalEstudantes).toFixed(2) + '%';
+                        row.push(dadoGenero ? dadoGenero.quantidade : 0, percentual);
+                    });
+                    chartData.addRows([row]);
+                });
+
+                const options = {
+                    title: 'Gráfico de Candidatos que Concluiram Curso Superior por Faixa Etária e Gênero da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    bars: 'group',
+                    hAxis: { title: 'Faixa Etária' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + generos.map(genero => {
+                    const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
+                    const percentualGenero = (totalGenero * 100 / totalEstudantes).toFixed(2) + '%';
+                    return `<strong>${genero}</strong>: ${totalGenero} (${percentualGenero})`;
+                }).join(', ');
+            });
+        });
+    }
 
 
 
