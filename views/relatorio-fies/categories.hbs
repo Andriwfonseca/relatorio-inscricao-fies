@@ -19,7 +19,8 @@
 				<li onclick="showGraficoEtniaArea()"><label class="button-insight" for="pcd-area">Pessoas Com Deficiência por Área</label></li>
 				<li onclick="showGraficoGeneroArea()"><label class="button-insight" for="genero-area">Candidatos por Gênero e Área</label></li>
 				<li onclick="showGraficoSituacaoInscricaoPcd()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos com PCD</label></li>
-				<li onclick="showGraficoSituacaoInscricaoGenero()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos por Gênero</label></li>
+				<li onclick="showGraficoSituacaoInscricaoGenero()"><label class="button-insight" for="situacao-inscricao-genero">Situação das Inscrições dos Candidatos por Gênero</label></li>
+				<li onclick="showGraficoSituacaoInscricaoEtnia()"><label class="button-insight" for="situacao-inscricao-etnia">Situação das Inscrições dos Candidatos por Etnia</label></li>
 
 			</ul>            
 		</div>
@@ -50,6 +51,14 @@
         getGraficoSituacaoInscricaoPcd("centro-oeste");
         getGraficoSituacaoInscricaoPcd("nordeste");
         getGraficoSituacaoInscricaoPcd("sudeste");
+    }
+
+    function showGraficoSituacaoInscricaoEtnia() {
+        getGraficoSituacaoInscricaoEtnia("sul");
+        getGraficoSituacaoInscricaoEtnia("norte");
+        getGraficoSituacaoInscricaoEtnia("centro-oeste");
+        getGraficoSituacaoInscricaoEtnia("nordeste");
+        getGraficoSituacaoInscricaoEtnia("sudeste");
     }
 
     function showGraficoSituacaoInscricaoGenero() {
@@ -1320,6 +1329,109 @@
         });
 
     }
+
+    function getGraficoSituacaoInscricaoEtnia(regiao) {
+    $.ajax({
+        url: 'http://localhost:3004/relatorio-fies/get-etnia-situacao-incricao/' + regiao,
+        type: 'get',
+        dataType: 'json',
+    }).done(function (data) {
+        const contagemPorSituacaoEtnia = {};
+
+        // Inicializar contagem para cada situação de inscrição e etnia
+        data.forEach(item => {
+            const situacao = item.situacao_inscricao_fies;
+            const etnia = item.etnia_cor;
+
+            if (!contagemPorSituacaoEtnia[situacao]) {
+                contagemPorSituacaoEtnia[situacao] = {};
+            }
+
+            if (!contagemPorSituacaoEtnia[situacao][etnia]) {
+                contagemPorSituacaoEtnia[situacao][etnia] = 0;
+            }
+
+            contagemPorSituacaoEtnia[situacao][etnia]++;
+        });
+
+        // Converter o objeto em um array para usar no gráfico de barras
+        const dadosFormatados = [];
+        Object.keys(contagemPorSituacaoEtnia).forEach(situacao => {
+            Object.keys(contagemPorSituacaoEtnia[situacao]).forEach(etnia => {
+                dadosFormatados.push({
+                    situacao: situacao,
+                    etnia: etnia,
+                    quantidade: contagemPorSituacaoEtnia[situacao][etnia]
+                });
+            });
+        });
+
+        // Calcular a quantidade total de registros
+        const totalRegistros = data.length;
+
+        // Criar o gráfico de barras agrupadas com base na situação de inscrição e etnia
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(function () {
+            const chartData = new google.visualization.DataTable();
+            chartData.addColumn('string', 'Situação de Inscrição');
+
+            // Adicionar colunas para cada etnia
+            const etnias = [...new Set(dadosFormatados.map(item => item.etnia))];
+            etnias.forEach(etnia => {
+                chartData.addColumn('number', etnia);
+                chartData.addColumn({ type: 'string', role: 'annotation' });
+            });
+
+            // Verificar o número correto de colunas no DataTable
+            const numColunasDataTable = etnias.length * 2 + 1;
+            
+            // Verificar se o número de colunas está correto
+            if (chartData.getNumberOfColumns() !== numColunasDataTable) {
+                console.error('Erro: Número incorreto de colunas no DataTable.');
+                return;
+            }
+
+            // Adicionar dados ao DataTable
+            const linhas = [];
+            Object.keys(contagemPorSituacaoEtnia).forEach(situacao => {
+                const dadosSituacao = dadosFormatados.filter(item => item.situacao === situacao);
+                const linha = [situacao];
+
+                etnias.forEach(etnia => {
+                    const dadoEtnia = dadosSituacao.find(item => item.etnia === etnia);
+                    const percentual = ((dadoEtnia ? dadoEtnia.quantidade : 0) * 100 / totalRegistros).toFixed(2) + '%';
+                    linha.push(dadoEtnia ? dadoEtnia.quantidade : 0, percentual);
+                });
+
+                linhas.push(linha);
+            });
+
+            chartData.addRows(linhas);
+
+            const options = {
+                title: 'Gráfico por Situação de Inscrição FIES Separado por Etnia na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                isStacked: true,
+                hAxis: { title: 'Situação de Inscrição' },
+                vAxis: { title: 'Número de Registros' }
+            };
+
+            const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+            chart.draw(chartData, options);
+
+            // Atualizar a legenda
+            const legenda = document.getElementById(`legenda-${regiao}`);
+            legenda.innerHTML = '<strong>Legenda:</strong> ' + etnias.map(etnia => {
+                const totalEtnia = dadosFormatados.filter(item => item.etnia === etnia).reduce((total, item) => total + item.quantidade, 0);
+                const percentualEtnia = (totalEtnia * 100 / totalRegistros).toFixed(2) + '%';
+                return `<strong>${etnia}</strong>: ${totalEtnia} (${percentualEtnia})`;
+            }).join(', ');
+        });
+    });
+}
+
+
+
+
 
 
 

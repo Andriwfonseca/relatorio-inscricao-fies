@@ -218,6 +218,20 @@ export class RelatorioFiesService {
           
           return data;
     }
+
+    public async getSituacaoInscricaoEtnia(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                situacao_inscricao_fies: true,
+                etnia_cor: true
+            },
+            where: {
+                regiao_grupo_preferencia: regiao
+            },
+          });
+          
+          return data;
+    }
     
     public async getAreaGeneroERegiao(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({

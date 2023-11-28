@@ -151,6 +151,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getSituacaoInscricaoGenero(regiao);
     }
 
+    @Get('get-etnia-situacao-incricao/:regiao')
+    @ApiOperation({
+        summary: "Retorna a situação de inscrições no FIES dos candidatos por Etnia",
+        description: "Retorna a situação de inscrições no FIES dos candidatos por Etnia"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getSituacaoInscricaoEtnia (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getSituacaoInscricaoEtnia(regiao);
+    }
+
     
     @Get('get-distribuicao-genero/:regiao')
     @ApiOperation({
