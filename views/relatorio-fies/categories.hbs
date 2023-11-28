@@ -21,7 +21,8 @@
 				<li onclick="showGraficoSituacaoInscricaoPcd()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos com PCD</label></li>
 				<li onclick="showGraficoSituacaoInscricaoGenero()"><label class="button-insight" for="situacao-inscricao-genero">Situação das Inscrições dos Candidatos por Gênero</label></li>
 				<li onclick="showGraficoSituacaoInscricaoEtnia()"><label class="button-insight" for="situacao-inscricao-etnia">Situação das Inscrições dos Candidatos por Etnia</label></li>
-				<li onclick="showGraficoGeneroCursoSuperior()"><label class="button-insight" for="genero-curso-superior">Curso Superior Concluído por Gênero</label></li>
+				<li onclick="showGraficoGeneroCursoSuperior()"><label class="button-insight" for="genero-curso-superior">Curso Superior Concluído por Gênero e Faixa Etária</label></li>
+				<li onclick="showGraficoEtniaCursoSuperior()"><label class="button-insight" for="etnia-curso-superior">Curso Superior Concluído por Etnia</label></li>
 
 			</ul>            
 		</div>
@@ -60,6 +61,14 @@
         getGraficoGeneroCursoSuperior("centro-oeste");
         getGraficoGeneroCursoSuperior("nordeste");
         getGraficoGeneroCursoSuperior("sudeste");
+    }
+
+    function showGraficoEtniaCursoSuperior() {
+        getGraficoEtniaCursoSuperior("parda", "sul");
+        getGraficoEtniaCursoSuperior("branca", "norte");
+        getGraficoEtniaCursoSuperior("preta", "centro-oeste");
+        getGraficoEtniaCursoSuperior("amarela", "nordeste");
+        getGraficoEtniaCursoSuperior("indígena", "sudeste");
     }
 
     function showGraficoSituacaoInscricaoEtnia() {
@@ -1553,7 +1562,76 @@
         });
     }
 
+    function getGraficoEtniaCursoSuperior(etnia, regiao){
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-curso-superior-etnia/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorEtnia = {};
 
+            // Loop através do conjunto de dados para contar cada etnia
+            data.forEach(item => {
+                const etnia = item.etnia_cor;
+
+                // Incrementar a contagem para a etnia encontrada
+                if (!contagemPorEtnia.hasOwnProperty(etnia)) {
+                    contagemPorEtnia[etnia] = 0;
+                }
+
+                contagemPorEtnia[etnia]++;
+            });
+
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
+            // Mapear os valores das etnias para rótulos mais descritivos
+            // (Você pode ajustar conforme necessário)
+            const rotulosEtnia = {
+                'BRANCA': 'Branca',
+                'PRETA': 'Preta',
+                'PARDA': 'Parda',
+                'AMARELA': 'Amarela',
+                'INDÍGENA': 'Indígena'
+            };
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = Object.keys(rotulosEtnia).map(etnia => {
+                const percentual = ((contagemPorEtnia[etnia] || 0) * 100 / totalRegistros).toFixed(2) + '%';
+                return {
+                    etnia: rotulosEtnia[etnia],
+                    quantidade: contagemPorEtnia[etnia] || 0,
+                    percentual: percentual
+                };
+            });
+
+            // Criar o gráfico de barras com base nas etnias
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Etnia');
+                chartData.addColumn('number', 'Número de Registros');
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => [item.etnia, item.quantidade, `${item.quantidade} (${item.percentual})`]));
+
+                const options = {
+                    title: 'Gráfico por Etnia que já Concluiram Curso Superior na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    legend: { position: 'none' },
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => `<strong>${item.etnia}</strong>: <span class="legenda-quantidade">${item.quantidade} (${item.percentual})</span>`).join(', ');
+            });
+        }).fail(function (jqXHR, textStatus, msg) {
+            alert('Erro na requisição: ' + msg);
+        });  
+    }
 
 
 

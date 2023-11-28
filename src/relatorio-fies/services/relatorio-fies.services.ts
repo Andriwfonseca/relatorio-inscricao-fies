@@ -176,6 +176,21 @@ export class RelatorioFiesService {
           return data;
     }
 
+    public async getCursoSuperiorEtnia(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                etnia_cor: true,                
+                regiao_grupo_preferencia: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+                concluiu_curso_superior: "Sim",
+            },
+          });
+          
+          return data;
+    }
+
     public async getAreaPcdPorEtniaERegiao(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({
             select: {
