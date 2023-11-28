@@ -131,6 +131,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getAreaGeneroERegiao(regiao);
     }
 
+    @Get('get-pcd-situacao-incricao/:regiao')
+    @ApiOperation({
+        summary: "Retorna a situação de inscrições no FIES dos candidatos com PCD",
+        description: "Retorna a situação de inscrições no FIES dos candidatos com PCD"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getSituacaoInscricaoPcd (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getSituacaoInscricaoPcd(regiao);
+    }
+
     
     @Get('get-distribuicao-genero/:regiao')
     @ApiOperation({

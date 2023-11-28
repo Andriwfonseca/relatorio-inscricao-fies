@@ -18,6 +18,7 @@
 				<li onclick="showGraficoCandidatosPcdGenero()"><label class="button-insight" for="pcd-genero">Pessoas Com Deficiência por Gênero e Idade</label></li>
 				<li onclick="showGraficoEtniaArea()"><label class="button-insight" for="pcd-area">Pessoas Com Deficiência por Área</label></li>
 				<li onclick="showGraficoGeneroArea()"><label class="button-insight" for="genero-area">Candidatos por Gênero e Área</label></li>
+				<li onclick="showGraficoSituacaoInscricaoPcd()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos com PCD</label></li>
 
 			</ul>            
 		</div>
@@ -42,6 +43,14 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <script type="text/javascript">
+    function showGraficoSituacaoInscricaoPcd() {
+        getGraficoSituacaoInscricaoPcd("sul");
+        getGraficoSituacaoInscricaoPcd("norte");
+        getGraficoSituacaoInscricaoPcd("centro-oeste");
+        getGraficoSituacaoInscricaoPcd("nordeste");
+        getGraficoSituacaoInscricaoPcd("sudeste");
+    }
+    
     function showGraficoEnsinoMedioPorFaixaDeAnoEEtnia() {
         getGraficoEnsinoMedioPorFaixaDeAnoEEtnia("sul");
         getGraficoEnsinoMedioPorFaixaDeAnoEEtnia("norte");
@@ -1141,6 +1150,72 @@
                 legenda.innerHTML = '<strong>Legenda:</strong> ' + Object.keys(contagemPorGeneroArea).map(genero => {
                     const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
                     return `<strong>${genero}</strong>: ${totalGenero}`;
+                }).join(', ');
+            });
+        });
+    }
+
+    function getGraficoSituacaoInscricaoPcd(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-pcd-situacao-incricao/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorSituacao = {};
+
+            // Inicializar contagem para cada situação de inscrição
+            data.forEach(item => {
+                const situacao = item.situacao_inscricao_fies;
+
+                if (!contagemPorSituacao[situacao]) {
+                    contagemPorSituacao[situacao] = 0;
+                }
+
+                contagemPorSituacao[situacao]++;
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = Object.keys(contagemPorSituacao).map(situacao => ({
+                situacao: situacao,
+                quantidade: contagemPorSituacao[situacao]
+            }));
+
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
+            // Criar o gráfico de barras empilhadas com base na situação de inscrição
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Situação de Inscrição');
+                chartData.addColumn('number', 'Quantidade');
+                chartData.addColumn({ type: 'string', role: 'annotation' });
+                chartData.addColumn({ type: 'string', role: 'tooltip' });
+
+                // Adicionar dados ao DataTable
+                const linhas = [];
+                dadosFormatados.forEach(item => {
+                    const percentual = ((item.quantidade * 100) / totalRegistros).toFixed(2) + '%';
+                    const linha = [item.situacao, item.quantidade, percentual, null];
+                    linhas.push(linha);
+                });
+
+                chartData.addRows(linhas);
+
+                const options = {
+                    title: 'Gráfico por Situação de Inscrição FIES na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    isStacked: true,
+                    hAxis: { title: 'Situação de Inscrição' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => {
+                    return `<strong>${item.situacao}</strong>: ${item.quantidade}`;
                 }).join(', ');
             });
         });

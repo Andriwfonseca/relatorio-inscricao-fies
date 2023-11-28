@@ -190,6 +190,20 @@ export class RelatorioFiesService {
           
           return data;
     }
+
+    public async getSituacaoInscricaoPcd(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                situacao_inscricao_fies: true
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+                pessoa_deficiente: "Sim"
+            },
+          });
+          
+          return data;
+    }
     
     public async getAreaGeneroERegiao(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({
