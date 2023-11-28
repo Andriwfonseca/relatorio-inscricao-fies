@@ -141,6 +141,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getSituacaoInscricaoPcd(regiao);
     }
 
+    @Get('get-genero-situacao-incricao/:regiao')
+    @ApiOperation({
+        summary: "Retorna a situação de inscrições no FIES dos candidatos por Gênero",
+        description: "Retorna a situação de inscrições no FIES dos candidatos por Gênero"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getSituacaoInscricaoGenero (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getSituacaoInscricaoGenero(regiao);
+    }
+
     
     @Get('get-distribuicao-genero/:regiao')
     @ApiOperation({

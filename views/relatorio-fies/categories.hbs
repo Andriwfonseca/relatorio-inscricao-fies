@@ -19,6 +19,7 @@
 				<li onclick="showGraficoEtniaArea()"><label class="button-insight" for="pcd-area">Pessoas Com Deficiência por Área</label></li>
 				<li onclick="showGraficoGeneroArea()"><label class="button-insight" for="genero-area">Candidatos por Gênero e Área</label></li>
 				<li onclick="showGraficoSituacaoInscricaoPcd()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos com PCD</label></li>
+				<li onclick="showGraficoSituacaoInscricaoGenero()"><label class="button-insight" for="situacao-inscricao-pcd">Situação das Inscrições dos Candidatos por Gênero</label></li>
 
 			</ul>            
 		</div>
@@ -49,6 +50,14 @@
         getGraficoSituacaoInscricaoPcd("centro-oeste");
         getGraficoSituacaoInscricaoPcd("nordeste");
         getGraficoSituacaoInscricaoPcd("sudeste");
+    }
+
+    function showGraficoSituacaoInscricaoGenero() {
+        getGraficoSituacaoInscricaoGenero("sul");
+        getGraficoSituacaoInscricaoGenero("norte");
+        getGraficoSituacaoInscricaoGenero("centro-oeste");
+        getGraficoSituacaoInscricaoGenero("nordeste");
+        getGraficoSituacaoInscricaoGenero("sudeste");
     }
     
     function showGraficoEnsinoMedioPorFaixaDeAnoEEtnia() {
@@ -1221,6 +1230,96 @@
         });
     }
 
+    function getGraficoSituacaoInscricaoGenero(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-genero-situacao-incricao/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorSituacaoGenero = {};
+
+            // Inicializar contagem para cada situação de inscrição e gênero
+            data.forEach(item => {
+                const situacao = item.situacao_inscricao_fies;
+                const genero = item.sexo;
+
+                if (!contagemPorSituacaoGenero[situacao]) {
+                    contagemPorSituacaoGenero[situacao] = {};
+                }
+
+                if (!contagemPorSituacaoGenero[situacao][genero]) {
+                    contagemPorSituacaoGenero[situacao][genero] = 0;
+                }
+
+                contagemPorSituacaoGenero[situacao][genero]++;
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = [];
+            Object.keys(contagemPorSituacaoGenero).forEach(situacao => {
+                Object.keys(contagemPorSituacaoGenero[situacao]).forEach(genero => {
+                    dadosFormatados.push({
+                        situacao: situacao,
+                        genero: genero,
+                        quantidade: contagemPorSituacaoGenero[situacao][genero]
+                    });
+                });
+            });
+
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
+            // Criar o gráfico de barras agrupadas com base na situação de inscrição e gênero
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Situação de Inscrição');
+
+                // Adicionar colunas para cada gênero
+                const generos = [...new Set(dadosFormatados.map(item => item.genero))];
+                generos.forEach(genero => {
+                    chartData.addColumn('number', genero);
+                    chartData.addColumn({ type: 'string', role: 'annotation' });
+                });
+
+                // Adicionar dados ao DataTable
+                const linhas = [];
+                Object.keys(contagemPorSituacaoGenero).forEach(situacao => {
+                    const dadosSituacao = dadosFormatados.filter(item => item.situacao === situacao);
+                    const linha = [situacao];
+
+                    generos.forEach(genero => {
+                        const dadoGenero = dadosSituacao.find(item => item.genero === genero);
+                        const percentual = ((dadoGenero ? dadoGenero.quantidade : 0) * 100 / totalRegistros).toFixed(2) + '%';
+                        linha.push(dadoGenero ? dadoGenero.quantidade : 0, percentual);
+                    });
+
+                    linhas.push(linha);
+                });
+
+                chartData.addRows(linhas);
+
+                const options = {
+                    title: 'Gráfico por Situação de Inscrição FIES Separado por Gênero na Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    bars: 'group',
+                    hAxis: { title: 'Situação de Inscrição' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + generos.map(genero => {
+                    const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
+                    const percentualGenero = (totalGenero * 100 / totalRegistros).toFixed(2) + '%';
+                    return `<strong>${genero}</strong>: ${totalGenero} (${percentualGenero})`;
+                }).join(', ');
+            });
+        });
+
+    }
 
 
 
