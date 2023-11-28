@@ -15,6 +15,7 @@
 				<li onclick="showGraficoMediaIdadeRendaPerCapta()"><label class="button-insight" for="media-idade-renda-per-capta">Média da idade dos Candidatos por Renda per Capita</label></li>
 				<li onclick="showGraficoEnsinoMedioPorFaixaDeAnoEEtnia()"><label class="button-insight" for="ensino-medio-faixa-ano-etnia">Ensino Médio por Faixa de Ano e Etnia</label></li>
 				<li onclick="showGraficoQtdPcdEtnia()"><label class="button-insight" for="pcd-etnia">Pessoas Com Deficiência por Etnia</label></li>
+				<li onclick="showGraficoCandidatosPcdGenero()"><label class="button-insight" for="pcd-genero">Pessoas Com Deficiência por Gênero</label></li>
 
 			</ul>            
 		</div>
@@ -64,11 +65,11 @@
     }
 
     function showGraficoQtdPcdEtnia() {
-        getGraficoQtdPcdEtnia("parda", "sul");
-        getGraficoQtdPcdEtnia("branca", "norte");
-        getGraficoQtdPcdEtnia("preta", "centro-oeste");
-        getGraficoQtdPcdEtnia("amarela", "nordeste");
-        getGraficoQtdPcdEtnia("indígena", "sudeste");
+        getGraficoCandidatosPcdEtnia("parda", "sul");
+        getGraficoCandidatosPcdEtnia("branca", "norte");
+        getGraficoCandidatosPcdEtnia("preta", "centro-oeste");
+        getGraficoCandidatosPcdEtnia("amarela", "nordeste");
+        getGraficoCandidatosPcdEtnia("indígena", "sudeste");
     }
     
     function showGraficoGenero() {
@@ -101,6 +102,14 @@
         getGraficoRenda("centro-oeste");
         getGraficoRenda("nordeste");
         getGraficoRenda("sudeste");           
+    }
+
+    function showGraficoCandidatosPcdGenero() {        
+        getGraficoCandidatosPcdGenero("sul");
+        getGraficoCandidatosPcdGenero("norte");
+        getGraficoCandidatosPcdGenero("centro-oeste");
+        getGraficoCandidatosPcdGenero("nordeste");
+        getGraficoCandidatosPcdGenero("sudeste");           
     }
 
     function showGraficoMediaIdadeRendaPerCapta() {
@@ -659,7 +668,7 @@
         });
     }
 
-   function getGraficoEnsinoMedioPorFaixaDeAnoEEtnia(regiao) {
+    function getGraficoEnsinoMedioPorFaixaDeAnoEEtnia(regiao) {
         $.ajax({
             url: 'http://localhost:3004/relatorio-fies/get-ensino-medio-faixa-ano-etnia/' + regiao,
             type: 'get',
@@ -767,7 +776,7 @@
         });
     }
 
-    function getGraficoQtdPcdEtnia(etnia, regiao){
+    function getGraficoCandidatosPcdEtnia(etnia, regiao){
         $.ajax({
             url: 'http://localhost:3004/relatorio-fies/get-pcd-etnia/' + etnia,
             type: 'get',
@@ -814,5 +823,120 @@
                 }).join(', ');
             });
         });  
+    }
+
+    function getGraficoCandidatosPcdGenero(regiao){
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-pcd-genero/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorFaixaEtariaGenero = {};
+            console.log(data, 'data')
+            // Definir as faixas etárias desejadas
+            let faixasEtarias = [
+                { min: 19, max: 24, label: '19-24' },
+                { min: 25, max: 29, label: '25-29' },
+                { min: 30, max: 34, label: '30-34' },
+                { min: 35, max: 39, label: '35-39' },
+                { min: 40, max: 44, label: '40-44' },
+                { min: 45, max: 49, label: '45-49' },
+                { min: 50, max: 69, label: '50-69' }
+            ];
+
+            faixasEtarias = faixasEtarias.map(item => {
+                const quantEstudantes = data.filter(estudante => (estudante.idade >= item.min && estudante.idade <= item.max)).length;
+
+                return {
+                    min: item.min,
+                    max: item.max,
+                    label: item.label,
+                    quantidade: quantEstudantes
+                };
+            });
+
+            // Definir os gêneros
+            const generos = ['M', 'F']; // Assume 'M' para Masculino e 'F' para Feminino
+
+            // Inicializar contagem para cada faixa etária e gênero
+            faixasEtarias.forEach(faixa => {
+                contagemPorFaixaEtariaGenero[faixa.label] = {};
+                generos.forEach(genero => {
+                    contagemPorFaixaEtariaGenero[faixa.label][genero] = 0;
+                });
+            });
+
+            // Loop através do conjunto de dados para contar cada faixa etária e gênero
+            data.forEach(item => {
+                const idade = item.idade;
+                const genero = item.sexo; // Alterado de 'genero' para 'sexo' conforme o exemplo de retorno da API
+
+                // Encontrar a faixa etária correspondente
+                const faixa = faixasEtarias.find(faixa => idade >= faixa.min && idade <= faixa.max);
+
+                // Incrementar a contagem para a faixa etária e gênero encontrados
+                if (faixa && genero) {
+                    contagemPorFaixaEtariaGenero[faixa.label][genero]++;
+                }
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = [];
+            faixasEtarias.forEach(faixa => {
+                generos.forEach(genero => {
+                    dadosFormatados.push({
+                        faixa: faixa.label,
+                        genero: genero,
+                        quantidade: contagemPorFaixaEtariaGenero[faixa.label][genero]
+                    });
+                });
+            });
+
+            // Calcular a quantidade total de estudantes
+            const totalEstudantes = data.length;
+
+            // Criar o gráfico de barras com base nas faixas etárias e gêneros
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Faixa Etária');
+
+                // Adicionar colunas para cada gênero
+                generos.forEach(genero => {
+                    chartData.addColumn('number', genero);
+                    chartData.addColumn({ type: 'string', role: 'annotation' });
+                });
+
+                // Adicionar dados ao DataTable
+                faixasEtarias.forEach(faixa => {
+                    const dadosFaixa = dadosFormatados.filter(item => item.faixa === faixa.label);
+                    const row = [faixa.label];
+                    generos.forEach(genero => {
+                        const dadoGenero = dadosFaixa.find(item => item.genero === genero);
+                        const percentual = ((dadoGenero ? dadoGenero.quantidade : 0) * 100 / totalEstudantes).toFixed(2) + '%';
+                        row.push(dadoGenero ? dadoGenero.quantidade : 0, percentual);
+                    });
+                    chartData.addRows([row]);
+                });
+
+                const options = {
+                    title: 'Gráfico de Candidatos com PCD por Faixa Etária e Gênero da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    bars: 'group',
+                    hAxis: { title: 'Faixa Etária' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + generos.map(genero => {
+                    const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
+                    const percentualGenero = (totalGenero * 100 / totalEstudantes).toFixed(2) + '%';
+                    return `<strong>${genero}</strong>: ${totalGenero} (${percentualGenero})`;
+                }).join(', ');
+            });
+        });
     }
 </script>

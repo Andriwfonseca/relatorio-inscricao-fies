@@ -101,6 +101,16 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getPcdEtnia(etnia);
     }
 
+    @Get('get-pcd-genero/:etnia')
+    @ApiOperation({
+        summary: "Retorna a quantidade de candidatos com PCD e separados por genêro",
+        description: "Retorna a quantidade de candidatos com PCD e separados por genêro"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getPcdGenero (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getPcdGenero(regiao);
+    }
+
     
     @Get('get-distribuicao-genero/:regiao')
     @ApiOperation({
