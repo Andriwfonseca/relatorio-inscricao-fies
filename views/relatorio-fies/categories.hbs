@@ -11,9 +11,10 @@
 				<li onclick="showGraficoEtnia()"><label class="button-default" for="etnia">Etnia</label></li>
 				<li onclick="showGraficoRenda()"><label class="button-default" for="renda-familiar">Renda Familiar</label></li>				
                 <li onclick="showGraficoDistribuicaoGenero()"><label class="button-insight" for="distribuicao-genero">Distribuição de Gênero</label></li>
-				<li onclick="showGraficoPardosNotaEnem()"><label class="button-insight" for="nota-enem-etnia">Inscritos Com Melhores Nota Enem</label></li>
-				<li onclick="showGraficoMediaIdadeRendaPerCapta()"><label class="button-insight" for="media-idade-renda-per-capta">Média da idade dos Inscritos por Renda per Capita</label></li>
+				<li onclick="showGraficoEtniaNotaEnem()"><label class="button-insight" for="nota-enem-etnia">Candidatos Com Melhores Nota Enem</label></li>
+				<li onclick="showGraficoMediaIdadeRendaPerCapta()"><label class="button-insight" for="media-idade-renda-per-capta">Média da idade dos Candidatos por Renda per Capita</label></li>
 				<li onclick="showGraficoEnsinoMedioPorFaixaDeAnoEEtnia()"><label class="button-insight" for="ensino-medio-faixa-ano-etnia">Ensino Médio por Faixa de Ano e Etnia</label></li>
+				<li onclick="showGraficoQtdPcdEtnia()"><label class="button-insight" for="pcd-etnia">Pessoas Com Deficiência por Etnia</label></li>
 
 			</ul>            
 		</div>
@@ -54,12 +55,20 @@
         getGraficoDistribuicaoGenero("sudeste");
     }
 
-    function showGraficoPardosNotaEnem() {
-        getGraficoPardosNotaEnem("parda", "sul");
-        getGraficoPardosNotaEnem("branca", "norte");
-        getGraficoPardosNotaEnem("preta", "centro-oeste");
-        getGraficoPardosNotaEnem("amarela", "nordeste");
-        getGraficoPardosNotaEnem("indígena", "sudeste");
+    function showGraficoEtniaNotaEnem() {
+        getGraficoEtniaNotaEnem("parda", "sul");
+        getGraficoEtniaNotaEnem("branca", "norte");
+        getGraficoEtniaNotaEnem("preta", "centro-oeste");
+        getGraficoEtniaNotaEnem("amarela", "nordeste");
+        getGraficoEtniaNotaEnem("indígena", "sudeste");
+    }
+
+    function showGraficoQtdPcdEtnia() {
+        getGraficoQtdPcdEtnia("parda", "sul");
+        getGraficoQtdPcdEtnia("branca", "norte");
+        getGraficoQtdPcdEtnia("preta", "centro-oeste");
+        getGraficoQtdPcdEtnia("amarela", "nordeste");
+        getGraficoQtdPcdEtnia("indígena", "sudeste");
     }
     
     function showGraficoGenero() {
@@ -484,7 +493,7 @@
         });
     }    
    
-    function getGraficoPardosNotaEnem(etnia, regiao) {        
+    function getGraficoEtniaNotaEnem(etnia, regiao) {        
         $.ajax({
             url: 'http://localhost:3004/relatorio-fies/get-melhores-notas-etnia/' + etnia,
             type: 'get',
@@ -513,7 +522,7 @@
 
                 // Configurar as opções do gráfico
                 const options = {
-                    title: `Quantidade de Inscritos com Etnia ${etnia.charAt(0).toUpperCase()}${etnia.slice(1)} e com as Melhores Notas no ENEM por Região`,
+                    title: `Quantidade de Candidatos com Etnia ${etnia.charAt(0).toUpperCase()}${etnia.slice(1)} e com as Melhores Notas no ENEM por Região`,
                     bars: 'vertical', // Tipo de gráfico de barras
                     bar: { groupWidth: '50%' }, // Espaçamento entre barras
                 };
@@ -728,8 +737,7 @@
                     title: 'Gráfico por Faixa de Ano e Etnia da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
                     bars: 'group',
                     hAxis: { title: 'Faixa de Ano do Ensino Médio' },
-                    vAxis: { title: 'Número de Registros' },
-                    width: 800
+                    vAxis: { title: 'Número de Registros' }
                 };
 
                 const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
@@ -757,5 +765,54 @@
         }).fail(function (jqXHR, textStatus, msg) {
             alert('Erro na requisição: ' + msg);
         });
+    }
+
+    function getGraficoQtdPcdEtnia(etnia, regiao){
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-pcd-etnia/' + etnia,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            console.log(data, 'data')
+            // Converter o formato do data para algo mais fácil de usar
+            const dadosFormatados = data.map(item => ({
+                regiao: item.regiao_grupo_preferencia,
+                quantidade: item._count ? item._count.regiao_grupo_preferencia : 0
+            }));
+
+            // Calcular a quantidade total de candidatos
+            const totalCandidatos = dadosFormatados.reduce((total, item) => total + item.quantidade, 0);
+
+            // Criar o gráfico de barras com base nas regiões
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Região');
+                chartData.addColumn('number', 'Quantidade');
+                chartData.addColumn({ type: 'string', role: 'annotation' }); // Adicionar coluna para os percentuais
+                chartData.addRows(dadosFormatados.map(item => {
+                    const percentual = (item.quantidade / totalCandidatos * 100).toFixed(2) + '%';
+                    return [item.regiao, item.quantidade, percentual];
+                }));
+
+                // Configurar as opções do gráfico
+                const options = {
+                    title: `Quantidade de Candidatos com Etnia ${etnia.charAt(0).toUpperCase()}${etnia.slice(1)} que são PCD por Região`,
+                    bars: 'vertical', // Tipo de gráfico de barras
+                    bar: { groupWidth: '50%' }, // Espaçamento entre barras
+                };
+
+                // Criar o gráfico de barras
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + dadosFormatados.map(item => {
+                    const percentual = (item.quantidade / totalCandidatos * 100).toFixed(2) + '%';
+                    return `<strong>${item.regiao}</strong>: <span class="legenda-quantidade">${item.quantidade} (${percentual})</span>`;
+                }).join(', ');
+            });
+        });  
     }
 </script>

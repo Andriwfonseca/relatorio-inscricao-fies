@@ -87,8 +87,18 @@ export class RelatorioFiesController {
         description: "Retorna a quantidade de candidatos com melhores notas do enem por região"
     })
     @ApiResponse({ status: 200, description: "" })
-    public async getPardosMelhoresNotas (@Param("etnia") etnia: string) {
+    public async getMelhoresNotasEtnia (@Param("etnia") etnia: string) {
         return this.relatorioFiesService.getMelhoresNotasEtnia(etnia);
+    }
+
+    @Get('get-pcd-etnia/:etnia')
+    @ApiOperation({
+        summary: "Retorna a quantidade de candidatos com PCD e separados por etnia",
+        description: "Retorna a quantidade de candidatos com PCD e separados por etnia"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getPcdEtnia (@Param("etnia") etnia: string) {
+        return this.relatorioFiesService.getPcdEtnia(etnia);
     }
 
     

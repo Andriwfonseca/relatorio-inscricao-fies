@@ -135,12 +135,6 @@ export class RelatorioFiesService {
                 regiao_grupo_preferencia: true,
             },
             });     
-            
-        data.forEach((result) => {
-          console.log(`Região: ${result.regiao_grupo_preferencia}`);
-          console.log(`Quantidade: ${result._count.regiao_grupo_preferencia}`);
-        });     
-        
         return data;
     }
 
@@ -180,6 +174,23 @@ export class RelatorioFiesService {
           });
           
           return data;
+    }
+
+    public async getPcdEtnia(etnia: string) {
+        const data = await this.prisma.inscricao_fies.groupBy({
+            by: ["regiao_grupo_preferencia"],
+            where: {
+                regiao_grupo_preferencia: {
+                in: ["SUL", "NORTE", "CENTRO-OESTE", "SUDESTE", "NORDESTE"],
+                },
+                pessoa_deficiente: "Sim",
+                etnia_cor: etnia.toUpperCase()
+            },
+            _count: {
+                regiao_grupo_preferencia: true,
+            },
+            });     
+        return data;
     }
     
     public async importCsvAndPopulateTable () {   
