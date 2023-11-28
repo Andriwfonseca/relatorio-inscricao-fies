@@ -176,7 +176,7 @@ export class RelatorioFiesService {
           return data;
     }
 
-    public async getAreaSubAreaPcdPorEtniaERegiao(regiao: string) {        
+    public async getAreaPcdPorEtniaERegiao(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({
             select: {
                 etnia_cor: true,
@@ -185,6 +185,20 @@ export class RelatorioFiesService {
             where: {
                 regiao_grupo_preferencia: regiao,
                 pessoa_deficiente: "Sim"
+            },
+          });
+          
+          return data;
+    }
+    
+    public async getAreaGeneroERegiao(regiao: string) {        
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                sexo: true,
+                area_conhecimento: true
+            },
+            where: {
+                regiao_grupo_preferencia: regiao
             },
           });
           

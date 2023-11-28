@@ -17,7 +17,7 @@
 				<li onclick="showGraficoQtdPcdEtnia()"><label class="button-insight" for="pcd-etnia">Pessoas Com Deficiência por Etnia</label></li>
 				<li onclick="showGraficoCandidatosPcdGenero()"><label class="button-insight" for="pcd-genero">Pessoas Com Deficiência por Gênero e Idade</label></li>
 				<li onclick="showGraficoEtniaArea()"><label class="button-insight" for="pcd-area">Pessoas Com Deficiência por Área</label></li>
-				<li onclick="showGraficoGeneroArea()"><label class="button-insight" for="genero-area">Candidatos por Gênero por Área</label></li>
+				<li onclick="showGraficoGeneroArea()"><label class="button-insight" for="genero-area">Candidatos por Gênero e Área</label></li>
 
 			</ul>            
 		</div>
@@ -960,7 +960,7 @@
 
     function getGraficoEtniaArea(regiao) {
         $.ajax({
-            url: 'http://localhost:3004/relatorio-fies/get-pcd-area-sub-area/' + regiao,
+            url: 'http://localhost:3004/relatorio-fies/get-pcd-area/' + regiao,
             type: 'get',
             dataType: 'json',
         }).done(function (data) {
@@ -1047,6 +1047,100 @@
                 legenda.innerHTML = '<strong>Legenda:</strong> ' + Object.keys(contagemPorEtniaArea).map(etnia => {
                     const totalEtnia = dadosFormatados.filter(item => item.etnia === etnia).reduce((total, item) => total + item.quantidade, 0);
                     return `<strong>${etnia}</strong>: ${totalEtnia}`;
+                }).join(', ');
+            });
+        });
+    }
+
+    function getGraficoGeneroArea(regiao) {
+        $.ajax({
+            url: 'http://localhost:3004/relatorio-fies/get-genero-area/' + regiao,
+            type: 'get',
+            dataType: 'json',
+        }).done(function (data) {
+            const contagemPorGeneroArea = {};
+
+            // Inicializar contagem para cada gênero e área
+            data.forEach(item => {
+                const genero = item.sexo; // Supondo que o campo seja 'sexo'
+                const area = item.area_conhecimento;
+
+                if (!contagemPorGeneroArea[genero]) {
+                    contagemPorGeneroArea[genero] = {};
+                }
+
+                if (!contagemPorGeneroArea[genero][area]) {
+                    contagemPorGeneroArea[genero][area] = 0;
+                }
+
+                contagemPorGeneroArea[genero][area]++;
+            });
+
+            // Converter o objeto em um array para usar no gráfico de barras
+            const dadosFormatados = [];
+            Object.keys(contagemPorGeneroArea).forEach(genero => {
+                Object.keys(contagemPorGeneroArea[genero]).forEach(area => {
+                    dadosFormatados.push({
+                        genero: genero,
+                        area: area,
+                        quantidade: contagemPorGeneroArea[genero][area]
+                    });
+                });
+            });
+
+            // Calcular a quantidade total de registros
+            const totalRegistros = data.length;
+
+            // Criar o gráfico de barras empilhadas com base em gênero e área
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(function () {
+                const chartData = new google.visualization.DataTable();
+                chartData.addColumn('string', 'Gênero');
+
+                // Adicionar colunas para cada área
+                const areas = [...new Set(dadosFormatados.map(item => item.area))];
+                areas.forEach((area, index) => {
+                    chartData.addColumn('number', area);
+                    if (index === 0) {
+                        chartData.addColumn({ type: 'string', role: 'annotation' });
+                    }
+                });
+
+                // Adicionar dados ao DataTable
+                const linhas = [];
+                Object.keys(contagemPorGeneroArea).forEach(genero => {
+                    const dadosGenero = dadosFormatados.filter(item => item.genero === genero);
+                    const linha = [genero];
+
+                    areas.forEach((area, index) => {
+                        const dadoArea = dadosGenero.find(item => item.area === area);
+                        linha.push(dadoArea ? dadoArea.quantidade : 0);
+                        if (index === 0) {
+                            const percentual = ((dadosGenero.reduce((total, item) => total + item.quantidade, 0) * 100) / totalRegistros).toFixed(2) + '%';
+                            linha.push(percentual);
+                        }
+                    });
+
+                    linhas.push(linha);
+                });
+
+                chartData.addRows(linhas);
+
+                const options = {
+                    title: 'Gráfico por Gênero e Área da Região ' + regiao.charAt(0).toUpperCase() + regiao.slice(1),
+                    isStacked: true,
+                    hAxis: { title: 'Gênero' },
+                    vAxis: { title: 'Número de Registros' }
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById(`chart-${regiao}`));
+                chart.draw(chartData, options);
+
+                // Atualizar a legenda
+                const legenda = document.getElementById(`legenda-${regiao}`);
+                legenda.innerHTML = '<strong>Legenda:</strong> ' + Object.keys(contagemPorGeneroArea).map(genero => {
+                    const totalGenero = dadosFormatados.filter(item => item.genero === genero).reduce((total, item) => total + item.quantidade, 0);
+                    return `<strong>${genero}</strong>: ${totalGenero}`;
                 }).join(', ');
             });
         });

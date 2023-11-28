@@ -93,8 +93,8 @@ export class RelatorioFiesController {
 
     @Get('get-pcd-etnia/:etnia')
     @ApiOperation({
-        summary: "Retorna a quantidade de candidatos com PCD e separados por etnia",
-        description: "Retorna a quantidade de candidatos com PCD e separados por etnia"
+        summary: "Retorna candidatos com PCD e separados por etnia",
+        description: "Retorna candidatos com PCD e separados por etnia"
     })
     @ApiResponse({ status: 200, description: "" })
     public async getPcdEtnia (@Param("etnia") etnia: string) {
@@ -103,22 +103,32 @@ export class RelatorioFiesController {
 
     @Get('get-pcd-genero/:regiao')
     @ApiOperation({
-        summary: "Retorna a quantidade de candidatos com PCD e separados por genêro",
-        description: "Retorna a quantidade de candidatos com PCD e separados por genêro"
+        summary: "Retorna candidatos com PCD e separados por genêro",
+        description: "Retorna candidatos com PCD e separados por genêro"
     })
     @ApiResponse({ status: 200, description: "" })
     public async getPcdGenero (@Param("regiao") regiao: string) {
         return this.relatorioFiesService.getPcdGenero(regiao);
     }
 
-    @Get('get-pcd-area-sub-area/:regiao')
+    @Get('get-pcd-area/:regiao')
     @ApiOperation({
-        summary: "Retorna a quantidade de candidatos com PCD e área e sub-área",
-        description: "Retorna a quantidade de candidatos com PCD e área e sub-área"
+        summary: "Retorna candidatos com PCD e área",
+        description: "Retorna candidatos com PCD e área"
     })
     @ApiResponse({ status: 200, description: "" })
-    public async getAreaSubAreaPcdPorEtniaERegiao (@Param("regiao") regiao: string) {
-        return this.relatorioFiesService.getAreaSubAreaPcdPorEtniaERegiao(regiao);
+    public async getAreaPcdPorEtniaERegiao (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getAreaPcdPorEtniaERegiao(regiao);
+    }
+
+    @Get('get-genero-area/:regiao')
+    @ApiOperation({
+        summary: "Retorna candidatos por Gênero e área",
+        description: "Retorna candidatos por Gênero e área"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getAreaGeneroERegiao (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getAreaGeneroERegiao(regiao);
     }
 
     
