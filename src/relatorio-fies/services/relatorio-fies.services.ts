@@ -95,13 +95,13 @@ export class RelatorioFiesService {
     public async getRendaPerCapta(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({
             select: {
-                renda_familiar_mensal_bruta: true,
+                renda_mensal_bruta_per_capta: true,
                 regiao_grupo_preferencia: true,
                 data_nascimento: true,
             },
             where: {
                 regiao_grupo_preferencia: regiao,
-                renda_familiar_mensal_bruta: {
+                renda_mensal_bruta_per_capta: {
                     lt: 5000
                 }
             },
@@ -111,7 +111,7 @@ export class RelatorioFiesService {
             const anoNascimento = new Date(item.data_nascimento).getFullYear();
             const idade = new Date().getFullYear() - anoNascimento;
             return {
-                renda_per_capta: item.renda_familiar_mensal_bruta,
+                renda_per_capta: item.renda_mensal_bruta_per_capta,
                 regiao: item.regiao_grupo_preferencia,
                 idade: idade
             };
@@ -336,7 +336,7 @@ export class RelatorioFiesService {
                     parseInt(dataNascimentoParts[1]) - 1,
                     parseInt(dataNascimentoParts[0])
                 );
-                
+
                 await this.prisma.inscricao_fies.create({
                     data: {
                         ano_processo_seletivo: item.Anodoprocessoseletivo,
@@ -372,7 +372,7 @@ export class RelatorioFiesService {
                     }
                 });
                 count++;
-                console.log(item, 'item');
+                console.log(count, 'contador');
             }
         } catch (error) {
             console.error(error, 'erro');
