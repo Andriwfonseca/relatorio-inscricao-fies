@@ -1,43 +1,16 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# Projeto Acadêmico da Unisociesc
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Relatório de inscrição no FIES
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Como Instalar e rodar o projeto
 
-## (Criando um novo projeto)
-- Utilizar a versão do NODE 16.15.0 (sugestão instalar o nvm para trabalhar com varias versões)
-- No arquivo package.json, alterar o "name" do projeto.
-- Definir o usuário e senha da API, nos arquivos das pasta "config".
-- Definir a porta do serviço, nos arquivos da pasta "config".
-- Definir o prefix da URL do Nginx, nos arquivos da pasta "config". *PARA RODAR NO LOCALHOST, DEIXAR O PREFIXO EM BRANCO ""
-- No arquivo "main.ts", definir o title e a description do projeto.
-- No arquivo "manifest.json" da Pasta ZAT, definir as propriedades do APP.
-- Criar o novo modulo e seus artefatos, conforme a documentação: https://docs.nestjs.com/first-steps
+Instalar os pacotes do NPM com o seguinte comando:
 
-Instalar os pacotes do NPM com o seguinte comando: 
 ```bash
 $ npm install --save --legacy-peer-deps
 ```
 
-OBS: Se de erro no NPM INSTALL, executar o comando em um terminal como Administrador do Windows 
+OBS: Se de erro no NPM INSTALL, executar o comando em um terminal como Administrador do Windows
 
 ## Description
 
@@ -88,4 +61,3 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
-
