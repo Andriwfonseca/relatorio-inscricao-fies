@@ -138,6 +138,72 @@ export class RelatorioFiesService {
         return data;
     }
 
+    public async getMediaNotasEnemEtnia(regiao: string) {
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                etnia_cor: true,
+                regiao_grupo_preferencia: true,
+                matematica_tecnologias: true,
+                linguagens_codigos_tec: true,
+                ciencias_natureza_tec: true,
+                ciencias_humanas_tec: true,
+                redacao: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+            },
+        });
+    
+        // Filtra os registros cuja média das notas é maior que 499
+        const registrosFiltrados = data.filter((registro) => {
+            const notas = [
+                registro.matematica_tecnologias,
+                registro.linguagens_codigos_tec,
+                registro.ciencias_natureza_tec,
+                registro.ciencias_humanas_tec,
+                registro.redacao,
+            ];
+    
+            const media = notas.reduce((acc, nota) => acc + nota, 0) / notas.length;
+            return media > 499;
+        });
+    
+        return registrosFiltrados;
+    }
+
+    public async getMediaNotasEnemGenero(regiao: string) {
+        const data = await this.prisma.inscricao_fies.findMany({
+            select: {
+                sexo: true,
+                regiao_grupo_preferencia: true,
+                matematica_tecnologias: true,
+                linguagens_codigos_tec: true,
+                ciencias_natureza_tec: true,
+                ciencias_humanas_tec: true,
+                redacao: true,
+            },
+            where: {
+                regiao_grupo_preferencia: regiao,
+            },
+        });
+    
+        // Filtra os registros cuja média das notas é maior que 499
+        const registrosFiltrados = data.filter((registro) => {
+            const notas = [
+                registro.matematica_tecnologias,
+                registro.linguagens_codigos_tec,
+                registro.ciencias_natureza_tec,
+                registro.ciencias_humanas_tec,
+                registro.redacao,
+            ];
+    
+            const media = notas.reduce((acc, nota) => acc + nota, 0) / notas.length;
+            return media > 499;
+        });
+    
+        return registrosFiltrados;
+    }
+
     public async getDistribuicaoGenero(regiao: string) {        
         const data = await this.prisma.inscricao_fies.findMany({
             select: {
@@ -299,6 +365,7 @@ export class RelatorioFiesService {
                 regiao_grupo_preferencia: true,
             },
             });     
+            console.log(data, 'data')
         return data;
     }
 

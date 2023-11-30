@@ -192,6 +192,26 @@ export class RelatorioFiesController {
         return this.relatorioFiesService.getDistribuicaoGenero(regiao);
     }
 
+    @Get('get-media-enem-etnia/:regiao')
+    @ApiOperation({
+        summary: "Retorna um relatório com a média das notas do enem maior que 499 e filtrando por etnia",
+        description: "Retorna um relatório com a média das notas do enem maior que 499 e filtrando por etnia"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getMediaNotasEnemEtnia (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getMediaNotasEnemEtnia(regiao);
+    }
+
+    @Get('get-media-enem-genero/:regiao')
+    @ApiOperation({
+        summary: "Retorna um relatório com a média das notas do enem maior que 499 e filtrando por genero",
+        description: "Retorna um relatório com a média das notas do enem maior que 499 e filtrando por genero"
+    })
+    @ApiResponse({ status: 200, description: "" })
+    public async getMediaNotasEnemGenero (@Param("regiao") regiao: string) {
+        return this.relatorioFiesService.getMediaNotasEnemGenero(regiao);
+    }
+
     @Get('import-csv')
     @ApiOperation({
         summary: "Importa o csv e popula a tabela com os dados do csv",
